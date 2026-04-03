@@ -1,0 +1,20 @@
+{
+  "$schema": "https://shadcn-svelte.com/schema.json",
+  "aliases": {
+    "components": "$lib/components",
+    "utils": "$lib/utils",
+    "ui": "$lib/components/ui",
+    "hooks": "$lib/hooks",
+    "lib": "$lib"
+  },
+  "iconLibrary": "phosphor",
+  "menuAccent": "bold",
+  "menuColor": "default",
+  "registry": "https://shadcn-svelte.com/registry",
+  "style": "mira",
+  "tailwind": {
+    "css": "src/routes/layout.css",
+    "baseColor": "mist"
+  },
+  "typescript": true
+}
