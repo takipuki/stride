@@ -4,6 +4,8 @@
   "version": "0.0.3",
   "type": "module",
   "scripts": {
+    "j0:start": "cd judge0 && sudo docker-compose up -d db redis && sleep 10s && sudo docker-compose up -d",
+    "j0:stop": "cd judge0 && sudo docker-compose down db redis && sudo docker-compose down",
     "dev": "concurrently \"vite dev\" \"convex dev\"",
     "dev:frontend": "vite dev",
     "dev:backend": "convex dev",

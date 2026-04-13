@@ -1,6 +1,14 @@
 <script>
   import { onMount } from "svelte";
 
+  import { useConvexClient, useQuery } from 'convex-svelte';
+  import { toggleMode } from 'mode-watcher';
+
+  import { api } from '$convex/_generated/api.js';
+
+  const client = useConvexClient();
+  const query = useQuery(api.test_j0.get, {});
+
   let code = $state("");
   let stdin = $state("");
   let output = $state("");
@@ -14,10 +22,12 @@
     java: 62      // Java
   };
 
-  function saveToken(token) {
-    const existing = JSON.parse(localStorage.getItem("judge0_tokens") || "[]");
-    existing.unshift({ token, time: Date.now() });
-    localStorage.setItem("judge0_tokens", JSON.stringify(existing));
+  async function saveToken(token) {
+      try {
+        await client.mutation(api.test_j0.add, { token });
+      } catch (e) {
+        console.log(e);
+      }
   }
 
   async function runCode() {
@@ -41,7 +51,14 @@
 
       saveToken(data.token);
 
-      const decode = (str) => str ? atob(str) : "";
+      const decode = (str) => {
+        const escaped = escape(atob(str || ""));
+        try {
+          return decodeURIComponent(escaped);
+        } catch {
+          return unescape(escaped);
+        }
+      };
 
       output =
         decode(data.stdout) ||
