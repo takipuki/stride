@@ -2,8 +2,9 @@
 .svelte-kit
 build
 node_modules
-.env
-.env.*
+# Allow .env files so Dokploy's generated .env can be used during build
+!.env
+!.env.*
 !.env.example
 .vercel
 npm-debug.log*
