@@ -7,9 +7,11 @@
 
   import { locales, localizeHref } from '$lib/paraglide/runtime';
 
+
   import './layout.css';
 
   import favicon from '$lib/assets/favicon.svg';
+  
 
   let { children } = $props();
   setupConvex(PUBLIC_CONVEX_URL);
@@ -23,6 +25,9 @@
 <ModeWatcher />
 
 {@render children()}
+
+
+
 
 <div style="display:none">
   {#each locales as locale}
