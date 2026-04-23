@@ -17,7 +17,6 @@ import type * as problems from "../problems.js";
 import type * as sections from "../sections.js";
 import type * as snapshots from "../snapshots.js";
 import type * as submissions from "../submissions.js";
-import type * as tasks from "../tasks.js";
 import type * as test_j0 from "../test_j0.js";
 import type * as users from "../users.js";
 
@@ -37,7 +36,6 @@ declare const fullApi: ApiFromModules<{
   sections: typeof sections;
   snapshots: typeof snapshots;
   submissions: typeof submissions;
-  tasks: typeof tasks;
   test_j0: typeof test_j0;
   users: typeof users;
 }>;
