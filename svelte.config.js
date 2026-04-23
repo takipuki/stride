@@ -1,6 +1,6 @@
 import { relative, sep } from 'node:path';
-import adapter from '@sveltejs/adapter-node';
 import { mdsvex } from 'mdsvex';
+import adapter from 'svelte-adapter-bun';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {

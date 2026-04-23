@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { Languages as LanguagesIcon, Moon as MoonIcon, Sun as SunIcon } from 'lucide-svelte';
   import { onMount } from 'svelte';
-  import Tiptap from './Tiptap.svelte';
+
   import { Button } from '$lib/components/ui/button';
-  import { Languages as LanguagesIcon, Sun as SunIcon, Moon as MoonIcon } from 'lucide-svelte';
+
+  import Tiptap from './Tiptap.svelte';
 
   let content = $state(`
     <h1>Type your title here.</h1>
@@ -21,7 +23,7 @@
   onMount(() => {
     const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const storedTheme = localStorage.getItem('theme');
-    
+
     if (storedTheme === 'dark' || (!storedTheme && isSystemDark)) {
       isDark = true;
       document.documentElement.classList.add('dark');
@@ -31,9 +33,7 @@
     }
   });
 
-  function toggleLanguage() {
-    
-  }
+  function toggleLanguage() {}
 
   function toggleMode() {
     isDark = !isDark;
@@ -47,14 +47,12 @@
   }
 </script>
 
-<div class="min-h-screen bg-zinc-50 dark:bg-zinc-900 py-16 px-4 sm:px-8 transition-colors duration-300">
-  
-  <div class="max-w-4xl mx-auto flex flex-col gap-6">
-    
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="min-h-screen bg-zinc-50 px-4 py-16 transition-colors duration-300 sm:px-8 dark:bg-zinc-900">
+  <div class="mx-auto flex max-w-4xl flex-col gap-6">
+    <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
       <div>
         <h2 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">Stride Editor</h2>
-        <p class="text-zinc-500 mt-1">Faculty drafting area</p>
+        <p class="mt-1 text-zinc-500">Faculty drafting area</p>
       </div>
 
       <div class="flex gap-2">
@@ -64,17 +62,14 @@
         </Button>
         <Button onclick={toggleMode} variant="outline" size="icon" class="relative">
           <SunIcon class="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-          <MoonIcon class="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+          <MoonIcon
+            class="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
+          />
           <span class="sr-only">Toggle theme</span>
         </Button>
       </div>
     </div>
 
-    <Tiptap 
-      initialContent={content}
-      onUpdate={(html) => content = html}
-    />
-
+    <Tiptap initialContent={content} onUpdate={(html) => (content = html)} />
   </div>
-
 </div>
