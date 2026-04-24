@@ -1,23 +1,21 @@
 <script lang="ts">
- import * as Sidebar from "$lib/components/ui/sidebar/index.js";
- import AppSidebar from "$lib/components/app-sidebar.svelte";
- 
- let { children } = $props();
+  import AppSidebar from '$lib/components/app-sidebar.svelte';
+  import * as Sidebar from '$lib/components/ui/sidebar/index.js';
+
+  let { children } = $props();
 </script>
- 
+
 <Sidebar.Provider>
- <AppSidebar />
+  <AppSidebar />
 
- <main class="main-layout">
-  <Sidebar.Trigger />
+  <main class="main-layout">
+    <Sidebar.Trigger />
 
-  <div class="page-container">
-    {@render children?.()}
-  </div>
-
- </main>
+    <div class="page-container">
+      {@render children?.()}
+    </div>
+  </main>
 </Sidebar.Provider>
-
 
 <style>
   .main-layout {
@@ -35,8 +33,4 @@
     min-height: 0;
     overflow: hidden;
   }
-
-  
 </style>
-
-

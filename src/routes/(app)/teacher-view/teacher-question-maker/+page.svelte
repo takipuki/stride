@@ -150,8 +150,6 @@
                   <span class="font-semibold">Question-viewer</span>
                 </div>
               </Resizable.Pane>
-
-
             </Resizable.PaneGroup>
           </div>
         </Resizable.Pane>

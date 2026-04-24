@@ -136,47 +136,47 @@
   .tiptap:focus {
     outline: none !important;
   }
-  
+
   .tiptap pre {
     font-family: 'JetBrains Mono', monospace;
     background: transparent;
     padding: 0;
     margin: 0;
   }
-  
+
   .tiptap pre code {
     color: inherit;
   }
 
   /* IDE Syntax Highlighting Tokens */
-  .hljs-keyword, 
-  .hljs-operator, 
-  .hljs-pattern-match { 
-    color: #f97583; 
+  .hljs-keyword,
+  .hljs-operator,
+  .hljs-pattern-match {
+    color: #f97583;
   }
-  
-  .hljs-function, 
-  .hljs-title { 
-    color: #b392f0; 
+
+  .hljs-function,
+  .hljs-title {
+    color: #b392f0;
   }
-  
-  .hljs-string, 
-  .hljs-meta .hljs-string { 
-    color: #9ecbff; 
+
+  .hljs-string,
+  .hljs-meta .hljs-string {
+    color: #9ecbff;
   }
-  
-  .hljs-built_in, 
-  .hljs-type { 
-    color: #79b8ff; 
+
+  .hljs-built_in,
+  .hljs-type {
+    color: #79b8ff;
   }
-  
-  .hljs-number, 
-  .hljs-symbol { 
-    color: #fce6f3; 
+
+  .hljs-number,
+  .hljs-symbol {
+    color: #fce6f3;
   }
-  
-  .hljs-comment { 
-    color: #6a737d; 
-    font-style: italic; 
+
+  .hljs-comment {
+    color: #6a737d;
+    font-style: italic;
   }
 }
