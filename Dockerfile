@@ -13,7 +13,8 @@ COPY . .
 
 # Generate Convex files (requires CONVEX_DEPLOY_KEY)
 ARG CONVEX_DEPLOY_KEY
-RUN CONVEX_DEPLOY_KEY=$CONVEX_DEPLOY_KEY bunx convex codegen
+ARG PUBLIC_CONVEX_URL
+RUN CONVEX_DEPLOY_KEY=$CONVEX_DEPLOY_KEY PUBLIC_CONVEX_URL=$PUBLIC_CONVEX_URL bunx convex codegen
 
 # Build the project
 RUN bun run build
