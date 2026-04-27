@@ -34,6 +34,7 @@ export const listByRole = query({
 export const create = mutation({
   args: {
     name: v.string(),
+    email: v.string(),
     passwordHash: v.string(),
     role: v.union(v.literal('admin'), v.literal('teacher'), v.literal('student')),
     aboutMd: v.optional(v.string()),

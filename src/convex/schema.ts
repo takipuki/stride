@@ -4,13 +4,16 @@ import { v } from 'convex/values';
 export default defineSchema({
   users: defineTable({
     name: v.string(),
+    email: v.string(),
     passwordHash: v.string(),
     role: v.union(v.literal('admin'), v.literal('teacher'), v.literal('student')),
     aboutMd: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }).index('by_name', ['name']),
+  })
+    .index('by_name', ['name'])
+    .index('by_email', ['email']),
 
   sections: defineTable({
     name: v.string(),

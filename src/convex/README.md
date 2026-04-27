@@ -9,6 +9,7 @@ All timestamps are epoch milliseconds (`v.number()`).
 | Field        | Type                      | Notes              |
 | ------------ | ------------------------- | ------------------ |
 | name         | string                    |                    |
+| email        | string                    |                    |
 | passwordHash | string                    |                    |
 | role         | `admin\|teacher\|student` |                    |
 | aboutMd      | string?                   |                    |
