@@ -1,3 +1,5 @@
 {
-  "functions": "src/convex"
+  "functions": "src/convex",
+  "project": "stride",
+  "team": "zoorat"
 }
