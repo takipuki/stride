@@ -65,7 +65,7 @@
             const match = currentLine.match(/^\s*/);
             if (match) leadingSpace = match[0];
 
-            if (/[{\[(]\s*$/.test(currentLine)) {
+            if (/[{[(]\s*$/.test(currentLine)) {
               leadingSpace += '  ';
             }
           }
@@ -114,7 +114,14 @@
 </script>
 
 <div class="flex h-full w-full flex-col overflow-hidden bg-[#18181b] text-zinc-100">
-  <div class="flex-1 cursor-text overflow-y-auto p-6" onclick={() => editor?.chain().focus().run()}>
+  <div
+    class="flex-1 cursor-text overflow-y-auto p-6"
+    role="presentation"
+    onclick={() => editor?.chain().focus().run()}
+    onkeydown={(e) => {
+      if (e.key === 'Enter' || e.key === ' ') editor?.chain().focus().run();
+    }}
+  >
     <div bind:this={element}></div>
   </div>
 </div>

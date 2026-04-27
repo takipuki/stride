@@ -8,9 +8,20 @@
   import { Label } from '$lib/components/ui/label';
   import * as Table from '$lib/components/ui/table';
   import { Textarea } from '$lib/components/ui/textarea';
+  import type { PageData } from './$types';
 
   let { data }: { data: PageData } = $props();
   let languages = $derived(data.languages);
+
+  interface SubmissionResult {
+    status: { id: number; description: string };
+    stdout?: string;
+    stderr?: string;
+    compile_output?: string;
+    message?: string;
+    time?: string;
+    memory?: number;
+  }
 
   // Default State
   let selectedLanguageId = $state(50); // C (GCC 9.2.0)

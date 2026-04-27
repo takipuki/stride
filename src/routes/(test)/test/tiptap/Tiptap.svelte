@@ -23,7 +23,7 @@
   let editor = $state.raw<Editor>();
   let tick = $state(0);
 
-  function checkActive(type: string, options?: any) {
+  function checkActive(type: string, options?: Record<string, unknown>) {
     void tick;
     return editor?.isActive(type, options);
   }

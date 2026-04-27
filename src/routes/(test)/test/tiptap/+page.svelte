@@ -70,6 +70,6 @@
       </div>
     </div>
 
-    <Tiptap initialContent={content} onUpdate={(html) => (content = html)} />
+    <Tiptap initialContent={content} onUpdate={(html: string) => (content = html)} />
   </div>
 </div>

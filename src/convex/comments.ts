@@ -1,5 +1,6 @@
 import { v } from 'convex/values';
 
+import type { Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 
 export const get = query({
@@ -58,13 +59,13 @@ export const update = mutation({
 export const remove = mutation({
   args: { id: v.id('comments') },
   handler: async (ctx, args) => {
-    const deleteTree = async (id: string) => {
+    const deleteTree = async (id: Id<'comments'>) => {
       const replies = await ctx.db
         .query('comments')
-        .withIndex('by_parent', (q) => q.eq('parentCommentId', id as any))
+        .withIndex('by_parent', (q) => q.eq('parentCommentId', id))
         .collect();
       await Promise.all(replies.map((r) => deleteTree(r._id)));
-      await ctx.db.delete(id as any);
+      await ctx.db.delete(id);
     };
     await deleteTree(args.id);
   },
