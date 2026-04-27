@@ -31,7 +31,7 @@ This document outlines the URL structure for the application and what each page 
 ### Activities (Exams & Live Classes)
 
 - `/(app)/activities/new/+page.svelte` — Create a new exam or class.
-- `/(app)/activities/[activityId]/+page.svelte` — The live room (Exam interface or class viewer).
+- `/(app)/activities/[activityId]/[problemId]/+page.svelte` — The live room (Exam interface or class viewer).
 - `/(app)/activities/[activityId]/edit/+page.svelte` — Update activity settings, attach and reorder problems.
 - `/(app)/activities/[activityId]/results/+page.svelte` — Scoreboard showing all student submissions and grades.
 - `/(app)/activities/[activityId]/cctv/+page.svelte` — Live grid view of all student screenshares.
