@@ -57,7 +57,7 @@
     <div class="flex flex-col gap-6">
       <Card.Root class="overflow-hidden p-0">
         <Card.Content class="grid min-h-[550px] p-0 md:grid-cols-2">
-          <form class="flex flex-col justify-center p-6 md:p-8" onsubmit={onSubmit}>
+          <form class="flex flex-col justify-center p-6 md:p-10" onsubmit={onSubmit}>
             <FieldGroup>
               <div class="mb-6 flex flex-col items-center gap-2 text-center">
                 <h1 class="text-3xl font-bold">Welcome back</h1>
@@ -68,12 +68,7 @@
                 <Input id="email-{id}" type="email" placeholder="somik@uiu.ac.bd" required bind:value={email} />
               </Field>
               <Field>
-                <div class="flex items-center">
-                  <FieldLabel for="password-{id}">Password</FieldLabel>
-                  <a href="/forgot-password" class="ms-auto text-xs underline-offset-2 hover:underline">
-                    Forgot your password?
-                  </a>
-                </div>
+                <FieldLabel for="password-{id}">Password</FieldLabel>
                 <Input id="password-{id}" type="password" required bind:value={password} />
               </Field>
               <Field>
