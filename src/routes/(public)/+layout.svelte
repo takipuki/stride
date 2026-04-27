@@ -1,10 +1,10 @@
 <script lang="ts">
   import { page } from '$app/state';
+
   import { locales, localizeHref } from '$lib/paraglide/runtime';
+
   let { children } = $props();
 </script>
-
-
 
 {@render children()}
 
