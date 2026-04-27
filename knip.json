@@ -1,0 +1,4 @@
+{
+  "entry": ["src/routes/**/+*.{svelte,ts,js}", "src/hooks.{ts,js}", "src/convex/**/*.ts"],
+  "ignore": ["src/lib/components/ui/**", "src/lib/hooks/is-mobile.svelte.ts"]
+}

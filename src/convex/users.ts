@@ -9,13 +9,23 @@ export const get = query({
   },
 });
 
-export const getByName = query({
-  args: { name: v.string() },
-  handler: async (ctx, args) => {
-    return await ctx.db
+export const login = mutation({
+  args: { email: v.string(), passwordHash: v.string() },
+  handler: async (ctx, { email, passwordHash }) => {
+    const user = await ctx.db
       .query('users')
-      .withIndex('by_name', (q) => q.eq('name', args.name))
+      .withIndex('by_email', (q) => q.eq('email', email))
       .first();
+
+    if (!user) return null;
+    if (user.passwordHash !== passwordHash) return null;
+
+    return {
+      userId: user._id,
+      name: user.name,
+      email: user.email,
+      avatarUrl: user.avatarUrl ?? null,
+    };
   },
 });
 
@@ -34,6 +44,7 @@ export const listByRole = query({
 export const create = mutation({
   args: {
     name: v.string(),
+    email: v.string(),
     passwordHash: v.string(),
     role: v.union(v.literal('admin'), v.literal('teacher'), v.literal('student')),
     aboutMd: v.optional(v.string()),
