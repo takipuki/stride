@@ -1,10 +1,22 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
+
   import { locales, localizeHref } from '$lib/paraglide/runtime';
+  import { loadSession, session } from '$lib/session';
+
   let { children } = $props();
+
+  onMount(() => {
+    loadSession();
+    const unsub = session.subscribe((s) => {
+      if (s) goto('/dashboard');
+    });
+    return unsub;
+  });
 </script>
-
-
 
 {@render children()}
 
