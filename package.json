@@ -16,7 +16,8 @@
     "format": "prettier --write .",
     "test:unit": "vitest",
     "test": "npm run test:unit -- --run",
-    "knip": "knip"
+    "knip": "knip",
+    "check:colors": "bun scripts/check-colors.ts"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.2",
