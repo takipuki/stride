@@ -4,8 +4,6 @@
   "version": "0.0.3",
   "type": "module",
   "scripts": {
-    "j0:start": "cd judge0 && sudo docker-compose up -d db redis && sleep 10s && sudo docker-compose up -d",
-    "j0:stop": "cd judge0 && sudo docker-compose down db redis && sudo docker-compose down",
     "dev": "concurrently \"vite dev\" \"convex dev\"",
     "dev:frontend": "vite dev",
     "dev:backend": "convex dev",
@@ -17,9 +15,12 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test:unit": "vitest",
-    "test": "npm run test:unit -- --run"
+    "test": "npm run test:unit -- --run",
+    "knip": "knip"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.5.2",
+    "@commitlint/config-conventional": "^20.5.0",
     "@eslint/compat": "^2.0.3",
     "@eslint/js": "^10.0.1",
     "@fontsource-variable/geist": "^5.2.8",
@@ -27,8 +28,6 @@
     "@inlang/paraglide-js": "^2.10.0",
     "@internationalized/date": "^3.12.0",
     "@lucide/svelte": "^1.3.0",
-    "@sveltejs/adapter-auto": "^7.0.0",
-    "@sveltejs/adapter-node": "^5.5.4",
     "@sveltejs/kit": "^2.50.2",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@tailwindcss/forms": "^0.5.11",
@@ -58,6 +57,7 @@
     "formsnap": "^2.0.1",
     "globals": "^17.4.0",
     "husky": "^9.1.7",
+    "knip": "^6.7.0",
     "layerchart": "2.0.0-next.48",
     "lint-staged": "^16.4.0",
     "lowlight": "^3.3.0",
