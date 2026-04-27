@@ -22,15 +22,33 @@ Follow these steps to set up and run the project locally.
    bun i
    ```
 
-3. **Configure Environment Variables:**
+3. **Setup Judge0 locally:**
+
+   First make sure docker is running. Then,
+
+   ```bash
+   cd judge0
+   docker-compose up -d db redis
+   sleep 10s
+   docker-compose up -d
+   sleep 5s
+   ```
+
+   Your instance of Judge0 CE v1.13.1 is now up and running; visit docs at `http://<IP ADDRESS OF YOUR SERVER>:2358/docs`
+
+4. **Configure Environment Variables:**
    Create a `.env.local` file in the root directory and add the following:
 
    ```env
    # Judge0 instance URL (required for code execution)
    JUDGE0_URL=https://j0.zurat.dev/
+   JUDGE0_AUTH_TOKEN=<secret_token>
+
+   # OR a local instance
+   JUDGE0_URL=http://localhost:2358/
    ```
 
-4. **Initialize Convex:**
+5. **Initialize Convex:**
    The first time you run the project, you'll need to set up Convex:
    ```bash
    bun run dev
