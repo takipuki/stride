@@ -8,6 +8,7 @@ export type Session = {
   userId: Id<'users'>;
   name: string;
   email: string;
+  role: 'admin' | 'teacher' | 'student';
   avatarUrl: string | null;
 };
 

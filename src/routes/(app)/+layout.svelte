@@ -20,12 +20,9 @@
 
 <Sidebar.Provider>
   <AppSidebar />
-
-  <main class="flex-1">
-    <div class="p-2">
-      <Sidebar.Trigger />
+  <Sidebar.Inset>
+    <div class="flex flex-1 flex-col gap-4 p-4">
+      {@render children()}
     </div>
-
-    {@render children()}
-  </main>
+  </Sidebar.Inset>
 </Sidebar.Provider>

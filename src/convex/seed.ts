@@ -203,44 +203,384 @@ const SECTION_STUDENTS = Array.from({ length: 21 }).flatMap((_, secIdx) =>
 );
 
 const ACTIVITIES = [
+  // CSE 1111: Structured Programming Language
   {
-    sectionIndex: 1, // CSE 1111 SPL
-    title: 'Lab Assignment 01: Arrays',
+    sectionIndex: 1,
+    title: 'Lab 01: Variables and Loops',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY,
+    endTime: NOW + ONE_DAY,
+  },
+  {
+    sectionIndex: 1,
+    title: 'Lab 02: Functions and Arrays',
+    type: 'class' as const,
+    startTime: NOW - 2 * 60 * 60 * 1000,
+    endTime: NOW + 4 * 60 * 60 * 1000,
+  },
+  {
+    sectionIndex: 1,
+    title: 'Midterm Exam: Structured Programming',
+    type: 'exam' as const,
+    startTime: NOW - 30 * 60 * 1000,
+    endTime: NOW + 1 * 60 * 60 * 1000,
+  },
+
+  // CSE 1115: Object Oriented Programming
+  {
+    sectionIndex: 3,
+    title: 'Lab 01: Classes and Objects',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY * 4,
+    endTime: NOW - ONE_DAY * 3,
+  },
+  {
+    sectionIndex: 3,
+    title: 'Assignment 02: Inheritance and Polymorphism',
+    type: 'class' as const,
+    startTime: NOW,
+    endTime: NOW + ONE_DAY * 7,
+  },
+
+  // CSE 2215: Data Structure and Algorithms I
+  {
+    sectionIndex: 10,
+    title: 'Lab 01: Linked Lists',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY * 2,
+    endTime: NOW - ONE_DAY,
+  },
+  {
+    sectionIndex: 10,
+    title: 'Quiz 01: Complexity Analysis',
+    type: 'exam' as const,
+    startTime: NOW + ONE_DAY * 2,
+    endTime: NOW + ONE_DAY * 2 + 1 * 60 * 60 * 1000,
+  },
+
+  // CSE 2217: Data Structure and Algorithms II
+  {
+    sectionIndex: 12,
+    title: 'Lab 01: Graph Traversals',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY * 10,
+    endTime: NOW - ONE_DAY * 9,
+  },
+  {
+    sectionIndex: 12,
+    title: 'Assignment: Dynamic Programming',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY,
+    endTime: NOW + ONE_DAY * 5,
+  },
+
+  // CSE 3521: Database Management Systems
+  {
+    sectionIndex: 17,
+    title: 'Lab 01: SQL Basics',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY * 2,
+    endTime: NOW + ONE_DAY * 2,
+  },
+
+  // CSE 4509: Operating Systems
+  {
+    sectionIndex: 18,
+    title: 'Assignment: CPU Scheduling',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY * 3,
+    endTime: NOW + ONE_DAY * 3,
+  },
+
+  // CSE 3711: Computer Networks
+  {
+    sectionIndex: 19,
+    title: 'Quiz: IP Subnetting',
+    type: 'exam' as const,
+    startTime: NOW + ONE_DAY * 4,
+    endTime: NOW + ONE_DAY * 4 + 45 * 60 * 1000,
+  },
+
+  // CSE 3811: Artificial Intelligence
+  {
+    sectionIndex: 20,
+    title: 'Lab: BFS and DFS Implementation',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY * 1,
+    endTime: NOW + ONE_DAY * 4,
+  },
+
+  // Remaining Sections
+  {
+    sectionIndex: 0,
+    title: 'Quiz 01: Hardware Basics',
+    type: 'exam' as const,
+    startTime: NOW + ONE_DAY,
+    endTime: NOW + ONE_DAY + 30 * 60 * 1000,
+  },
+  {
+    sectionIndex: 2,
+    title: 'Lab: Pointers and Memory',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY * 2,
+    endTime: NOW + ONE_DAY,
+  },
+  {
+    sectionIndex: 4,
+    title: 'Lab: Java Collections',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY * 3,
+    endTime: NOW + ONE_DAY * 2,
+  },
+  {
+    sectionIndex: 5,
+    title: 'Assignment: Boolean Algebra',
+    type: 'class' as const,
+    startTime: NOW,
+    endTime: NOW + ONE_DAY * 5,
+  },
+  {
+    sectionIndex: 6,
+    title: 'Lab: Logic Gates Circuit',
     type: 'class' as const,
     startTime: NOW - ONE_DAY,
     endTime: NOW + ONE_DAY * 3,
   },
   {
-    sectionIndex: 3, // CSE 1115 OOP
-    title: 'Midterm Practical Exam',
+    sectionIndex: 7,
+    title: 'Lab: MIPS Assembly Basics',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY * 4,
+    endTime: NOW - ONE_DAY * 2,
+  },
+  {
+    sectionIndex: 8,
+    title: 'Lab: 8086 Interfacing',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY,
+    endTime: NOW + ONE_DAY * 5,
+  },
+  {
+    sectionIndex: 9,
+    title: 'Quiz: Sets and Relations',
     type: 'exam' as const,
+    startTime: NOW + ONE_DAY * 3,
+    endTime: NOW + ONE_DAY * 3 + 1 * 60 * 60 * 1000,
+  },
+  {
+    sectionIndex: 11,
+    title: 'Lab: Binary Search Trees',
+    type: 'class' as const,
     startTime: NOW - ONE_DAY * 2,
-    endTime: NOW - ONE_DAY,
+    endTime: NOW + ONE_DAY * 2,
+  },
+  {
+    sectionIndex: 13,
+    title: 'Assignment: NFA to DFA',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY * 5,
+    endTime: NOW - ONE_DAY * 1,
+  },
+  {
+    sectionIndex: 14,
+    title: 'Lab: UML Use Case Diagrams',
+    type: 'class' as const,
+    startTime: NOW,
+    endTime: NOW + ONE_DAY * 3,
+  },
+  {
+    sectionIndex: 15,
+    title: 'Quiz: Agile Methodology',
+    type: 'exam' as const,
+    startTime: NOW + ONE_DAY * 5,
+    endTime: NOW + ONE_DAY * 5 + 40 * 60 * 1000,
+  },
+  {
+    sectionIndex: 16,
+    title: 'Assignment: RSA Implementation',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY * 2,
+    endTime: NOW + ONE_DAY * 6,
   },
 ];
 
 const PROBLEMS = [
   {
     creatorIndex: 2, // Asnuva Tanvin
-    title: 'Even/Odd Array Sorter',
-    contentMd:
-      'Write a C program that takes an array of N integers and prints all even numbers followed by all odd numbers.',
-  },
+    title: 'Sum of Two Integers',
+    contentMd: 'Read two integers and print their sum.',
+  }, // 0
+  {
+    creatorIndex: 2,
+    title: 'Palindrome Checker',
+    contentMd: 'Write a program to check if a given string is a palindrome.',
+  }, // 1
+  {
+    creatorIndex: 2,
+    title: 'Factorial Calculation',
+    contentMd: 'Calculate the factorial of a given non-negative integer N.',
+  }, // 2
   {
     creatorIndex: 4, // Osama Haque
-    title: 'Bank Account Encapsulation',
-    contentMd: 'Design a Java class BankAccount. Implement deposit and withdraw methods with bounds checking.',
-  },
+    title: 'Bank Account Class',
+    contentMd:
+      'Create a BankAccount class in Java with private fields balance and accountId. Implement deposit() and withdraw() methods.',
+  }, // 3
+  {
+    creatorIndex: 4,
+    title: 'Shape Hierarchy',
+    contentMd:
+      'Implement a Shape interface and concrete classes Circle and Rectangle. Demonstrate polymorphism by calculating areas.',
+  }, // 4
+  {
+    creatorIndex: 11, // Tanvir Raihan
+    title: 'Singly Linked List Reversal',
+    contentMd: 'Given the head of a singly linked list, reverse the list and return its head.',
+  }, // 5
+  {
+    creatorIndex: 11,
+    title: 'Queue using Two Stacks',
+    contentMd: 'Implement a FIFO queue using only two stacks.',
+  }, // 6
+  {
+    creatorIndex: 13, // Tarek Hasan
+    title: 'Dijkstra Shortest Path',
+    contentMd: 'Implement Dijkstra algorithm to find the shortest path from a source node in a weighted graph.',
+  }, // 7
+  {
+    creatorIndex: 13,
+    title: '0/1 Knapsack Problem',
+    contentMd:
+      'Given weights and values of N items, put these items in a knapsack of capacity W to get the maximum total value.',
+  }, // 8
+  {
+    creatorIndex: 18, // Romizul Islam
+    title: 'Simple SQL Query',
+    contentMd: 'Write a SQL query to select all columns from the Employees table where Department is "Sales".',
+  }, // 9
+  {
+    creatorIndex: 2,
+    title: 'Prime Number Generator',
+    contentMd: 'Print all prime numbers between 1 and N.',
+  }, // 10
+  {
+    creatorIndex: 19, // Romizul Islam
+    title: 'FCFS Scheduling',
+    contentMd: 'Calculate average waiting time for N processes using First Come First Served scheduling.',
+  }, // 11
+  {
+    creatorIndex: 20, // Farhan Anan Himu
+    title: 'Subnet Mask Calculator',
+    contentMd: 'Given an IP address and CIDR notation, find the subnet mask.',
+  }, // 12
+  {
+    creatorIndex: 21, // Shoib Ahmed Shourav
+    title: 'BFS Traversal',
+    contentMd: 'Implement Breadth First Search for a given adjacency list of a graph.',
+  }, // 13
+  {
+    creatorIndex: 1, // Sidratul Muntaha
+    title: 'Pointer Arithmetic',
+    contentMd: 'Write a C program to demonstrate pointer arithmetic by iterating over an array using pointers.',
+  }, // 14
+  {
+    creatorIndex: 6, // Humaira Anzum Neha
+    title: 'Logic Gate Simulator',
+    contentMd: 'Given inputs A and B, simulate the output of an XOR gate without using the XOR operator.',
+  }, // 15
+  {
+    creatorIndex: 8, // Charles Aunkan Gomes
+    title: 'MIPS Addition',
+    contentMd: 'Write a MIPS assembly snippet to add two numbers stored in registers $s0 and $s1.',
+  }, // 16
+  {
+    creatorIndex: 17, // Nabila Sabrin Sworna
+    title: 'RSA Key Generation',
+    contentMd: 'Implement the RSA key generation algorithm given two prime numbers p and q.',
+  }, // 17
 ];
 
 const PROBLEM_IOS = [
-  { problemIndex: 0, inputData: '5\n1 2 3 4 5', outputData: '2 4\n1 3 5', ioOrder: 0 },
-  { problemIndex: 1, inputData: '100\nwithdraw 150', outputData: 'Insufficient Funds', ioOrder: 0 },
+  { problemIndex: 0, inputData: '5 10', outputData: '15', ioOrder: 0 },
+  { problemIndex: 1, inputData: 'madam', outputData: 'Yes', ioOrder: 0 },
+  { problemIndex: 1, inputData: 'hello', outputData: 'No', ioOrder: 1 },
+  { problemIndex: 2, inputData: '5', outputData: '120', ioOrder: 0 },
+  { problemIndex: 5, inputData: '1->2->3', outputData: '3->2->1', ioOrder: 0 },
+  {
+    problemIndex: 9,
+    inputData: 'No input',
+    outputData: 'SELECT * FROM Employees WHERE Department = "Sales"',
+    ioOrder: 0,
+  },
+  { problemIndex: 10, inputData: '10', outputData: '2 3 5 7', ioOrder: 0 },
+  { problemIndex: 11, inputData: '3\n0 5\n1 3\n2 8', outputData: 'Average Waiting Time: 4.33', ioOrder: 0 },
+  { problemIndex: 12, inputData: '192.168.1.0/24', outputData: '255.255.255.0', ioOrder: 0 },
+  { problemIndex: 13, inputData: '0: 1,2\n1: 2\n2: 0,3\n3: 3', outputData: '0 1 2 3', ioOrder: 0 },
+  { problemIndex: 14, inputData: '1 2 3', outputData: '1 2 3', ioOrder: 0 },
+  { problemIndex: 15, inputData: '0 1', outputData: '1', ioOrder: 0 },
+  { problemIndex: 16, inputData: '$s0=5, $s1=10', outputData: '$v0=15', ioOrder: 0 },
+  { problemIndex: 17, inputData: '61 53', outputData: 'n=3233, e=65537', ioOrder: 0 },
 ];
 
 const ACTIVITY_PROBLEMS = [
-  { activityIndex: 0, problemIndex: 0, problemOrder: 0 },
-  { activityIndex: 1, problemIndex: 1, problemOrder: 0 },
+  // SPL Lab 01: Variables and Loops
+  { activityIndex: 0, problemIndex: 0, problemOrder: 0 }, // Sum
+  { activityIndex: 0, problemIndex: 10, problemOrder: 1 }, // Prime
+
+  // SPL Lab 02: Functions and Arrays
+  { activityIndex: 1, problemIndex: 1, problemOrder: 0 }, // Palindrome
+  { activityIndex: 1, problemIndex: 2, problemOrder: 1 }, // Factorial
+
+  // SPL Midterm
+  { activityIndex: 2, problemIndex: 1, problemOrder: 0 }, // Palindrome (Reused)
+  { activityIndex: 2, problemIndex: 2, problemOrder: 1 }, // Factorial (Reused)
+  { activityIndex: 2, problemIndex: 10, problemOrder: 2 }, // Prime (Reused)
+
+  // OOP Lab 01
+  { activityIndex: 3, problemIndex: 3, problemOrder: 0 }, // Bank Account
+
+  // OOP Assignment 02
+  { activityIndex: 4, problemIndex: 4, problemOrder: 0 }, // Shape Hierarchy
+
+  // Data Structure Lab 01
+  { activityIndex: 5, problemIndex: 5, problemOrder: 0 }, // Linked List
+  { activityIndex: 5, problemIndex: 6, problemOrder: 1 }, // Queue
+
+  // Data Structure Quiz 01
+  { activityIndex: 6, problemIndex: 0, problemOrder: 0 }, // Sum (Reused for trivial complexity check)
+
+  // Algorithms II Lab 01
+  { activityIndex: 7, problemIndex: 7, problemOrder: 0 }, // Dijkstra
+
+  // Algorithms II Assignment
+  { activityIndex: 8, problemIndex: 8, problemOrder: 0 }, // Knapsack
+
+  // Database Lab 01
+  { activityIndex: 9, problemIndex: 9, problemOrder: 0 }, // SQL Query
+
+  // OS Assignment
+  { activityIndex: 10, problemIndex: 11, problemOrder: 0 }, // FCFS
+
+  // Networks Quiz
+  { activityIndex: 11, problemIndex: 12, problemOrder: 0 }, // Subnetting
+
+  // AI Lab
+  { activityIndex: 12, problemIndex: 13, problemOrder: 0 }, // BFS
+
+  // Remaining joins
+  { activityIndex: 13, problemIndex: 0, problemOrder: 0 }, // Quiz Hardware -> Sum (trivial)
+  { activityIndex: 14, problemIndex: 14, problemOrder: 0 }, // Pointers
+  { activityIndex: 15, problemIndex: 3, problemOrder: 0 }, // Java Collections -> Bank Account
+  { activityIndex: 16, problemIndex: 15, problemOrder: 0 }, // Boolean Algebra -> Logic Gate
+  { activityIndex: 17, problemIndex: 15, problemOrder: 0 }, // Logic Gates Lab
+  { activityIndex: 18, problemIndex: 16, problemOrder: 0 }, // MIPS Assembly
+  { activityIndex: 19, problemIndex: 16, problemOrder: 0 }, // 8086 Interfacing
+  { activityIndex: 20, problemIndex: 15, problemOrder: 0 }, // Sets -> Logic Gate (trivial)
+  { activityIndex: 21, problemIndex: 5, problemOrder: 0 }, // Binary Tree -> Linked List (reused)
+  { activityIndex: 22, problemIndex: 13, problemOrder: 0 }, // NFA -> BFS (reused)
+  { activityIndex: 23, problemIndex: 9, problemOrder: 0 }, // UML -> SQL (trivial)
+  { activityIndex: 24, problemIndex: 11, problemOrder: 0 }, // Agile -> FCFS (trivial)
+  { activityIndex: 25, problemIndex: 17, problemOrder: 0 }, // RSA
 ];
 
 const TAGS = [{ name: 'C/C++' }, { name: 'Java' }, { name: 'Exam-Help' }];

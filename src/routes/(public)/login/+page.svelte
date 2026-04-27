@@ -38,6 +38,7 @@
         userId: res.userId,
         name: res.name,
         email: res.email,
+        role: res.role,
         avatarUrl: res.avatarUrl,
       });
 
