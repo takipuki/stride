@@ -9,6 +9,16 @@ export const get = query({
   },
 });
 
+export const getByName = query({
+  args: { name: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('users')
+      .withIndex('by_name', (q) => q.eq('name', args.name))
+      .first();
+  },
+});
+
 export const listByRole = query({
   args: {
     role: v.union(v.literal('admin'), v.literal('teacher'), v.literal('student')),
@@ -30,7 +40,8 @@ export const create = mutation({
     avatarUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert('users', args);
+    const now = Date.now();
+    return await ctx.db.insert('users', { ...args, createdAt: now, updatedAt: now });
   },
 });
 
@@ -43,7 +54,7 @@ export const updateProfile = mutation({
   },
   handler: async (ctx, { id, ...fields }) => {
     const patch = Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined));
-    await ctx.db.patch(id, patch);
+    await ctx.db.patch(id, { ...patch, updatedAt: Date.now() });
   },
 });
 
@@ -53,7 +64,7 @@ export const updatePassword = mutation({
     passwordHash: v.string(),
   },
   handler: async (ctx, { id, passwordHash }) => {
-    await ctx.db.patch(id, { passwordHash });
+    await ctx.db.patch(id, { passwordHash, updatedAt: Date.now() });
   },
 });
 

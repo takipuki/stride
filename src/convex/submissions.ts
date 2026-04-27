@@ -88,8 +88,14 @@ export const submit = mutation({
     return await ctx.db.insert('submissions', {
       ...args,
       submittedAt: Date.now(),
-      judgeVerdict: undefined,
     });
+  },
+});
+
+export const remove = mutation({
+  args: { id: v.id('submissions') },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
   },
 });
 

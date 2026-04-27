@@ -8,7 +8,7 @@ export const listByChat = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let q = ctx.db
+    const q = ctx.db
       .query('messages')
       .withIndex('by_chat', (q) => q.eq('chatId', args.chatId))
       .order('asc');
@@ -27,6 +27,13 @@ export const send = mutation({
       ...args,
       sentAt: Date.now(),
     });
+  },
+});
+
+export const edit = mutation({
+  args: { id: v.id('messages'), content: v.string() },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { content: args.content });
   },
 });
 

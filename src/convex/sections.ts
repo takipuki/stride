@@ -22,7 +22,8 @@ export const create = mutation({
     aboutMd: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert('sections', args);
+    const now = Date.now();
+    return await ctx.db.insert('sections', { ...args, createdAt: now, updatedAt: now });
   },
 });
 
@@ -34,7 +35,7 @@ export const update = mutation({
   },
   handler: async (ctx, { id, ...fields }) => {
     const patch = Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined));
-    await ctx.db.patch(id, patch);
+    await ctx.db.patch(id, { ...patch, updatedAt: Date.now() });
   },
 });
 
@@ -62,6 +63,7 @@ export const addTeacher = mutation({
     return await ctx.db.insert('sectionTeachers', {
       sectionId: args.sectionId,
       teacherId: args.teacherId,
+      createdAt: Date.now(),
     });
   },
 });
@@ -120,6 +122,7 @@ export const addStudent = mutation({
     return await ctx.db.insert('sectionStudents', {
       sectionId: args.sectionId,
       studentId: args.studentId,
+      createdAt: Date.now(),
     });
   },
 });

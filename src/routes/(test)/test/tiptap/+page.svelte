@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { Languages as LanguagesIcon, Moon as MoonIcon, Sun as SunIcon } from 'lucide-svelte';
+  import LanguagesIcon from '@lucide/svelte/icons/languages';
+  import MoonIcon from '@lucide/svelte/icons/moon';
+  import SunIcon from '@lucide/svelte/icons/sun';
   import { onMount } from 'svelte';
 
   import { Button } from '$lib/components/ui/button';
@@ -70,6 +72,6 @@
       </div>
     </div>
 
-    <Tiptap initialContent={content} onUpdate={(html) => (content = html)} />
+    <Tiptap initialContent={content} onUpdate={(html: string) => (content = html)} />
   </div>
 </div>

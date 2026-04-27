@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { CheckCircle2, Info, Loader2, Play, Plus, Trash2, XCircle } from 'lucide-svelte';
+  import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
+  import Info from '@lucide/svelte/icons/info';
+  import Loader2 from '@lucide/svelte/icons/loader-2';
+  import Play from '@lucide/svelte/icons/play';
+  import Plus from '@lucide/svelte/icons/plus';
+  import Trash2 from '@lucide/svelte/icons/trash-2';
+  import XCircle from '@lucide/svelte/icons/x-circle';
 
   import { Badge } from '$lib/components/ui/badge';
   import { Button } from '$lib/components/ui/button';
@@ -9,8 +15,20 @@
   import * as Table from '$lib/components/ui/table';
   import { Textarea } from '$lib/components/ui/textarea';
 
+  import type { PageData } from './$types';
+
   let { data }: { data: PageData } = $props();
   let languages = $derived(data.languages);
+
+  interface SubmissionResult {
+    status: { id: number; description: string };
+    stdout?: string;
+    stderr?: string;
+    compile_output?: string;
+    message?: string;
+    time?: string;
+    memory?: number;
+  }
 
   // Default State
   let selectedLanguageId = $state(50); // C (GCC 9.2.0)

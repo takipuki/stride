@@ -8,16 +8,21 @@ export default defineSchema({
     role: v.union(v.literal('admin'), v.literal('teacher'), v.literal('student')),
     aboutMd: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
-  }),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index('by_name', ['name']),
 
   sections: defineTable({
     name: v.string(),
     aboutMd: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
   }),
 
   sectionTeachers: defineTable({
     sectionId: v.id('sections'),
     teacherId: v.id('users'),
+    createdAt: v.number(),
   })
     .index('by_section', ['sectionId'])
     .index('by_teacher', ['teacherId']),
@@ -25,6 +30,7 @@ export default defineSchema({
   sectionStudents: defineTable({
     sectionId: v.id('sections'),
     studentId: v.id('users'),
+    createdAt: v.number(),
   })
     .index('by_section', ['sectionId'])
     .index('by_student', ['studentId']),
@@ -35,18 +41,23 @@ export default defineSchema({
     startTime: v.number(),
     endTime: v.number(),
     type: v.union(v.literal('exam'), v.literal('class')),
+    createdAt: v.number(),
+    updatedAt: v.number(),
   }).index('by_section', ['sectionId']),
 
   problems: defineTable({
     createdBy: v.id('users'),
     title: v.string(),
     contentMd: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
   }).index('by_creator', ['createdBy']),
 
   activityProblems: defineTable({
     activityId: v.id('activities'),
     problemId: v.id('problems'),
     problemOrder: v.number(),
+    createdAt: v.number(),
   })
     .index('by_activity', ['activityId'])
     .index('by_problem', ['problemId']),
@@ -55,6 +66,7 @@ export default defineSchema({
     problemId: v.id('problems'),
     inputData: v.string(),
     outputData: v.string(),
+    ioOrder: v.number(),
   }).index('by_problem', ['problemId']),
 
   snapshots: defineTable({
@@ -83,6 +95,7 @@ export default defineSchema({
 
   chats: defineTable({
     name: v.string(),
+    createdAt: v.number(),
   }),
 
   chatMembers: defineTable({
@@ -103,6 +116,8 @@ export default defineSchema({
   posts: defineTable({
     authorId: v.id('users'),
     contentMd: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
   }).index('by_author', ['authorId']),
 
   tags: defineTable({
@@ -121,6 +136,8 @@ export default defineSchema({
     postId: v.id('posts'),
     parentCommentId: v.optional(v.id('comments')),
     content: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
   })
     .index('by_post', ['postId'])
     .index('by_parent', ['parentCommentId']),

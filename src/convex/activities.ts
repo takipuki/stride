@@ -28,7 +28,8 @@ export const create = mutation({
     type: v.union(v.literal('exam'), v.literal('class')),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert('activities', args);
+    const now = Date.now();
+    return await ctx.db.insert('activities', { ...args, createdAt: now, updatedAt: now });
   },
 });
 
@@ -42,7 +43,7 @@ export const update = mutation({
   },
   handler: async (ctx, { id, ...fields }) => {
     const patch = Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined));
-    await ctx.db.patch(id, patch);
+    await ctx.db.patch(id, { ...patch, updatedAt: Date.now() });
   },
 });
 
@@ -68,7 +69,7 @@ export const addProblem = mutation({
       .filter((q) => q.eq(q.field('problemId'), args.problemId))
       .first();
     if (existing) return existing._id;
-    return await ctx.db.insert('activityProblems', args);
+    return await ctx.db.insert('activityProblems', { ...args, createdAt: Date.now() });
   },
 });
 

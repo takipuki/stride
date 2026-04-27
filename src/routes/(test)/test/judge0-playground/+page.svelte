@@ -1,17 +1,15 @@
 <script lang="ts">
-  import {
-    Activity,
-    AlertCircle,
-    BarChart3,
-    CheckCircle2,
-    Globe,
-    Info,
-    Loader2,
-    Play,
-    Server,
-    Settings2,
-    Trash2,
-  } from 'lucide-svelte';
+  import Activity from '@lucide/svelte/icons/activity';
+  import AlertCircle from '@lucide/svelte/icons/alert-circle';
+  import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
+  import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
+  import Globe from '@lucide/svelte/icons/globe';
+  import Info from '@lucide/svelte/icons/info';
+  import Loader2 from '@lucide/svelte/icons/loader-2';
+  import Play from '@lucide/svelte/icons/play';
+  import Server from '@lucide/svelte/icons/server';
+  import Settings2 from '@lucide/svelte/icons/settings-2';
+  import Trash2 from '@lucide/svelte/icons/trash-2';
 
   import { Badge } from '$lib/components/ui/badge';
   import { Button } from '$lib/components/ui/button';

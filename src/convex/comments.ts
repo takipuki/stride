@@ -1,5 +1,6 @@
 import { v } from 'convex/values';
 
+import type { Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 
 export const get = query({
@@ -40,7 +41,8 @@ export const create = mutation({
     parentCommentId: v.optional(v.id('comments')),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert('comments', args);
+    const now = Date.now();
+    return await ctx.db.insert('comments', { ...args, createdAt: now, updatedAt: now });
   },
 });
 
@@ -50,19 +52,21 @@ export const update = mutation({
     content: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.id, { content: args.content });
+    await ctx.db.patch(args.id, { content: args.content, updatedAt: Date.now() });
   },
 });
 
 export const remove = mutation({
   args: { id: v.id('comments') },
   handler: async (ctx, args) => {
-    // Recursively delete replies first
-    const replies = await ctx.db
-      .query('comments')
-      .withIndex('by_parent', (q) => q.eq('parentCommentId', args.id))
-      .collect();
-    await Promise.all(replies.map((r) => ctx.db.delete(r._id)));
-    await ctx.db.delete(args.id);
+    const deleteTree = async (id: Id<'comments'>) => {
+      const replies = await ctx.db
+        .query('comments')
+        .withIndex('by_parent', (q) => q.eq('parentCommentId', id))
+        .collect();
+      await Promise.all(replies.map((r) => deleteTree(r._id)));
+      await ctx.db.delete(id);
+    };
+    await deleteTree(args.id);
   },
 });

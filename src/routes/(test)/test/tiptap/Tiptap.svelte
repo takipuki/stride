@@ -1,20 +1,18 @@
 <script lang="ts">
+  import Bold from '@lucide/svelte/icons/bold';
+  import Code from '@lucide/svelte/icons/code';
+  import Heading1 from '@lucide/svelte/icons/heading-1';
+  import Heading2 from '@lucide/svelte/icons/heading-2';
+  import Italic from '@lucide/svelte/icons/italic';
+  import List from '@lucide/svelte/icons/list';
+  import ListOrdered from '@lucide/svelte/icons/list-ordered';
+  import Quote from '@lucide/svelte/icons/quote';
+  import Redo from '@lucide/svelte/icons/redo';
+  import SquareCode from '@lucide/svelte/icons/square-code';
+  import Strikethrough from '@lucide/svelte/icons/strikethrough';
+  import Undo from '@lucide/svelte/icons/undo';
   import { Editor } from '@tiptap/core';
   import StarterKit from '@tiptap/starter-kit';
-  import {
-    Bold,
-    Code,
-    Heading1,
-    Heading2,
-    Italic,
-    List,
-    ListOrdered,
-    Quote,
-    Redo,
-    SquareCode,
-    Strikethrough,
-    Undo,
-  } from 'lucide-svelte';
   import { onDestroy, onMount } from 'svelte';
 
   let { initialContent = '', onUpdate } = $props();
@@ -23,7 +21,7 @@
   let editor = $state.raw<Editor>();
   let tick = $state(0);
 
-  function checkActive(type: string, options?: any) {
+  function checkActive(type: string, options?: Record<string, unknown>) {
     void tick;
     return editor?.isActive(type, options);
   }

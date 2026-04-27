@@ -1,4 +1,5 @@
 import type { Language } from '$lib/server/judge0';
+
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ fetch }) => {
@@ -8,7 +9,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
     fetch('/api/judge0/workers'),
     fetch('/api/judge0/system'),
     fetch('/api/judge0/statistics'),
-    fetch('/api/judge0/statuses')
+    fetch('/api/judge0/statuses'),
   ]);
 
   let languages: Language[] = [];
