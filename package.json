@@ -11,7 +11,7 @@
     "dev:backend": "convex dev",
     "build": "vite build",
     "preview": "vite preview",
-    "prepare": "svelte-kit sync || echo ''",
+    "prepare": "svelte-kit sync || echo '' && husky",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "eslint .",
@@ -57,7 +57,9 @@
     "eslint-plugin-svelte": "^3.15.2",
     "formsnap": "^2.0.1",
     "globals": "^17.4.0",
+    "husky": "^9.1.7",
     "layerchart": "2.0.0-next.48",
+    "lint-staged": "^16.4.0",
     "lowlight": "^3.3.0",
     "mdsvex": "^0.12.6",
     "mode-watcher": "^1.1.0",
@@ -91,5 +93,8 @@
   "dependencies": {
     "convex": "^1.36.1",
     "convex-svelte": "^0.0.12"
+  },
+  "lint-staged": {
+    "*": "prettier --write --ignore-unknown"
   }
 }
