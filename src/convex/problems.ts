@@ -33,7 +33,8 @@ export const create = mutation({
     contentMd: v.string(),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert('problems', args);
+    const now = Date.now();
+    return await ctx.db.insert('problems', { ...args, createdAt: now, updatedAt: now });
   },
 });
 
@@ -45,7 +46,7 @@ export const update = mutation({
   },
   handler: async (ctx, { id, ...fields }) => {
     const patch = Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined));
-    await ctx.db.patch(id, patch);
+    await ctx.db.patch(id, { ...patch, updatedAt: Date.now() });
   },
 });
 
@@ -63,6 +64,7 @@ export const addIO = mutation({
     problemId: v.id('problems'),
     inputData: v.string(),
     outputData: v.string(),
+    ioOrder: v.number(),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert('problemIos', args);
@@ -74,6 +76,7 @@ export const updateIO = mutation({
     id: v.id('problemIos'),
     inputData: v.optional(v.string()),
     outputData: v.optional(v.string()),
+    ioOrder: v.optional(v.number()),
   },
   handler: async (ctx, { id, ...fields }) => {
     const patch = Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined));
@@ -91,9 +94,10 @@ export const removeIO = mutation({
 export const listIO = query({
   args: { problemId: v.id('problems') },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const rows = await ctx.db
       .query('problemIos')
       .withIndex('by_problem', (q) => q.eq('problemId', args.problemId))
       .collect();
+    return rows.sort((a, b) => a.ioOrder - b.ioOrder);
   },
 });

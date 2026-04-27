@@ -26,7 +26,7 @@ export const create = mutation({
     memberIds: v.array(v.id('users')),
   },
   handler: async (ctx, args) => {
-    const chatId = await ctx.db.insert('chats', { name: args.name });
+    const chatId = await ctx.db.insert('chats', { name: args.name, createdAt: Date.now() });
     await Promise.all(
       args.memberIds.map((userId) => ctx.db.insert('chatMembers', { chatId, userId, joinedAt: Date.now() })),
     );
@@ -77,6 +77,13 @@ export const listMembers = query({
       .withIndex('by_chat', (q) => q.eq('chatId', args.chatId))
       .collect();
     return Promise.all(rows.map((r) => ctx.db.get(r.userId)));
+  },
+});
+
+export const rename = mutation({
+  args: { id: v.id('chats'), name: v.string() },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { name: args.name });
   },
 });
 

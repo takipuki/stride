@@ -52,7 +52,8 @@ export const create = mutation({
     tagIds: v.optional(v.array(v.id('tags'))),
   },
   handler: async (ctx, { tagIds, ...args }) => {
-    const postId = await ctx.db.insert('posts', args);
+    const now = Date.now();
+    const postId = await ctx.db.insert('posts', { ...args, createdAt: now, updatedAt: now });
     if (tagIds?.length) {
       await Promise.all(tagIds.map((tagId) => ctx.db.insert('postTags', { postId, tagId })));
     }
@@ -67,7 +68,7 @@ export const update = mutation({
   },
   handler: async (ctx, { id, ...fields }) => {
     const patch = Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined));
-    await ctx.db.patch(id, patch);
+    await ctx.db.patch(id, { ...patch, updatedAt: Date.now() });
   },
 });
 
