@@ -43,7 +43,7 @@
           </form>
 
           <div class="relative hidden h-full w-full items-center justify-center border-l bg-black select-none md:flex">
-            <img src={loginImage} alt="graduation image">
+            <img src={loginImage} alt="graduation image" class="absolute inset-0 h-full w-full object-cover opacity-80">
           </div>
           
         </Card.Content>
