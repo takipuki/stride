@@ -58,6 +58,7 @@ export const save = mutation({
     problemId: v.id('problems'),
     activityId: v.id('activities'),
     content: v.string(),
+    languageId: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert('snapshots', {

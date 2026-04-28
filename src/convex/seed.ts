@@ -23,598 +23,135 @@ const TABLES = [
   'comments',
 ] as const;
 
+const DEFAULT_PASS = 'pass';
+const NOW = Date.now();
+const ONE_HOUR = 60 * 60 * 1000;
+const ONE_DAY = 24 * ONE_HOUR;
+
 // --- HELPERS ---
 
 function avatar(email: string) {
   return `https://api.dicebear.com/9.x/thumbs/svg?seed=${email}`;
 }
 
-// --- SEED DATA ---
-
-const DEFAULT_PASS = 'pass';
-const NOW = Date.now();
-const ONE_DAY = 24 * 60 * 60 * 1000;
+// --- DATA ---
 
 const USERS = [
-  // 0: Admin
-  { name: 'Stride Admin', email: 'admin@uiu.bd', passwordHash: DEFAULT_PASS, role: 'admin' as const },
-
-  // 1-21: UIU Teachers
-  { name: 'Sidratul Muntaha', email: 'sidratul@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Asnuva Tanvin', email: 'tanvin@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Tasmin Sanjida', email: 'sanjida@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'A.H.M. Osama Haque', email: 'haqueosama1@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  {
-    name: 'Sidratul Tanzila Tasmi',
-    email: 'tanzila@uiu.bd',
-    passwordHash: DEFAULT_PASS,
-    role: 'teacher' as const,
-  },
-  { name: 'Humaira Anzum Neha', email: 'humaira@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  {
-    name: 'Md. Mushfiqul Haque Omi',
-    email: 'mushfiqul@uiu.bd',
-    passwordHash: DEFAULT_PASS,
-    role: 'teacher' as const,
-  },
-  {
-    name: 'Charles Aunkan Gomes',
-    email: 'charles@uiu.bd',
-    passwordHash: DEFAULT_PASS,
-    role: 'teacher' as const,
-  },
-  { name: 'Umama Rahman', email: 'umama@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Md. Shadman Aadeeb', email: 'shadman@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  {
-    name: 'Md. Shafqat Talukder',
-    email: 'shafqat@uiu.bd',
-    passwordHash: DEFAULT_PASS,
-    role: 'teacher' as const,
-  },
-  { name: 'Asif Ahmed Utsa', email: 'asif@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Md. Tanvir Raihan', email: 'tanvir@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Kazi Abdun Noor', email: 'abdunnoor@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Md. Tarek Hasan', email: 'tarek@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Nabila Sabrin Sworna', email: 'nabila@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Samin Sharaf Somik', email: 'samin@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Md. Romizul Islam', email: 'romizul@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Farhan Anan Himu', email: 'himu@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Shoib Ahmed Shourav', email: 'shoib@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Anika Tasnim Rodela', email: 'anika@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-
-  // 22-51: UIU Students (30 Total)
-  { name: 'Rakibul Hasan', email: 'rhasan21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  {
-    name: 'Sadia Tabassum',
-    email: 'stabassum22@uiu.bd',
-    passwordHash: DEFAULT_PASS,
-    role: 'student' as const,
-  },
-  { name: 'Nafis Ahmed', email: 'nahmed22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Fahim Faisal', email: 'ffaisal23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  {
-    name: 'Jannatul Ferdous',
-    email: 'jferdous23@uiu.bd',
-    passwordHash: DEFAULT_PASS,
-    role: 'student' as const,
-  },
-  { name: 'Tanmoy Das', email: 'tdas23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Mehedi Hasan', email: 'mhasan21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Nusrat Jahan', email: 'njahan22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Arif Mahmud', email: 'amahmud21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Farhan Ahmed', email: 'fahmed23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Mehnaz Islam', email: 'mislam22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Rafiq Uddin', email: 'ruddin21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Nabila Rahman', email: 'nrahman23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Tahmid Hasan', email: 'thasan22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Ashikur Rahman', email: 'arahman21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Sumaiya Akter', email: 'sakter23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Kawsar Ahmed', email: 'kahmed22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Ritu Parna', email: 'rparna21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Shakib Al Hasan', email: 'shasan23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Habiba Khatun', email: 'hkhatun22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Imran Hossain', email: 'ihossain21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Jui Barua', email: 'jbarua23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Kamal Uddin', email: 'kuddin22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Lamiya Haque', email: 'lhaque21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Mahmudul Hasan', email: 'mahmudul23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  {
-    name: 'Nipa Chowdhury',
-    email: 'nchowdhury22@uiu.bd',
-    passwordHash: DEFAULT_PASS,
-    role: 'student' as const,
-  },
-  { name: 'Osman Gani', email: 'ogani21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  {
-    name: 'Parveen Sultana',
-    email: 'psultana23@uiu.bd',
-    passwordHash: DEFAULT_PASS,
-    role: 'student' as const,
-  },
-  { name: 'Qazi Anwar', email: 'qanwar22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Rina Begum', email: 'rbegum21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Stride Admin', email: 'admin@uiu.bd', role: 'admin' as const },
+  { name: 'Sidratul Muntaha', email: 'sidratul@uiu.bd', role: 'teacher' as const }, // index 1
+  { name: 'Asnuva Tanvin', email: 'tanvin@uiu.bd', role: 'teacher' as const }, // index 2
+  { name: 'Fahim Faisal', email: 'ffaisal23@uiu.bd', role: 'student' as const }, // index 3
+  { name: 'Rakibul Hasan', email: 'rhasan21@uiu.bd', role: 'student' as const }, // index 4
+  { name: 'Sadia Tabassum', email: 'stabassum22@uiu.bd', role: 'student' as const },
+  { name: 'Nafis Ahmed', email: 'nahmed22@uiu.bd', role: 'student' as const },
+  { name: 'Jannatul Ferdous', email: 'jferdous23@uiu.bd', role: 'student' as const },
 ];
 
 const SECTIONS = [
-  { name: 'CSE 1110: Introduction to Computer Systems', aboutMd: 'Basic concepts of computer hardware and software.' }, // 0
   {
     name: 'CSE 1111: Structured Programming Language',
     aboutMd: 'Introduction to C programming, loops, arrays, and pointers.',
-  }, // 1
-  { name: 'CSE 1112: Structured Programming Language Laboratory', aboutMd: 'Hands-on practice for C programming.' }, // 2
-  { name: 'CSE 1115: Object Oriented Programming', aboutMd: 'Deep dive into Java, inheritance, and polymorphism.' }, // 3
-  { name: 'CSE 1116: Object Oriented Programming Laboratory', aboutMd: 'Hands-on OOP implementation in Java.' }, // 4
-  { name: 'CSE 1325: Digital Logic Design', aboutMd: 'Logic gates, boolean algebra, and sequential circuits.' }, // 5
-  { name: 'CSE 1326: Digital Logic Design Laboratory', aboutMd: 'Practical circuits and logic gates.' }, // 6
-  {
-    name: 'CSE 3313: Computer Architecture',
-    aboutMd: 'Instruction set architecture, pipelining, and memory hierarchy.',
-  }, // 7
-  {
-    name: 'CSE 4325: Microprocessors and Microcontrollers',
-    aboutMd: '8086 architecture, assembly language, and interfacing.',
-  }, // 8
-  { name: 'CSE 2213: Discrete Mathematics', aboutMd: 'Logic, sets, functions, and graph theory basics.' }, // 9
-  { name: 'CSE 2215: Data Structure and Algorithms I', aboutMd: 'Linked lists, trees, and basic searching/sorting.' }, // 10
-  { name: 'CSE 2216: Data Structure and Algorithms I Laboratory', aboutMd: 'Implementing data structures in C++.' }, // 11
-  {
-    name: 'CSE 2217: Data Structure and Algorithms II',
-    aboutMd: 'Advanced graphs, dynamic programming, and greedy methods.',
-  }, // 12
-  { name: 'CSE 2233: Theory of Computation', aboutMd: 'Automata, Turing machines, and computability.' }, // 13
-  { name: 'CSE 3411: System Analysis and Design', aboutMd: 'Software lifecycles, UML, and system modeling.' }, // 14
-  { name: 'CSE 3421: Software Engineering', aboutMd: 'Agile, testing, and modern software practices.' }, // 15
-  { name: 'CSE 4531: Computer Security', aboutMd: 'Cryptography, network security, and secure coding.' }, // 16
-  { name: 'CSE 3521: Database Management Systems', aboutMd: 'SQL, normalization, and database architecture.' }, // 17
-  { name: 'CSE 4509: Operating Systems', aboutMd: 'Processes, threads, scheduling, and file systems.' }, // 18
-  { name: 'CSE 3711: Computer Networks', aboutMd: 'OSI model, TCP/IP, routing, and switching.' }, // 19
-  { name: 'CSE 3811: Artificial Intelligence', aboutMd: 'Search algorithms, ML basics, and neural networks.' }, // 20
-];
-
-const SECTION_TEACHERS = [
-  { sectionIndex: 0, teacherIndex: 1 },
-  { sectionIndex: 1, teacherIndex: 2 },
-  { sectionIndex: 2, teacherIndex: 3 },
-  { sectionIndex: 3, teacherIndex: 4 },
-  { sectionIndex: 4, teacherIndex: 5 },
-  { sectionIndex: 5, teacherIndex: 6 },
-  { sectionIndex: 6, teacherIndex: 7 },
-  { sectionIndex: 7, teacherIndex: 8 },
-  { sectionIndex: 8, teacherIndex: 9 },
-  { sectionIndex: 9, teacherIndex: 10 },
-  { sectionIndex: 10, teacherIndex: 11 },
-  { sectionIndex: 11, teacherIndex: 12 },
-  { sectionIndex: 12, teacherIndex: 13 },
-  { sectionIndex: 13, teacherIndex: 14 },
-  { sectionIndex: 14, teacherIndex: 15 },
-  { sectionIndex: 15, teacherIndex: 16 },
-  { sectionIndex: 16, teacherIndex: 17 },
-  { sectionIndex: 17, teacherIndex: 18 },
-  { sectionIndex: 18, teacherIndex: 19 },
-  { sectionIndex: 19, teacherIndex: 20 },
-  { sectionIndex: 20, teacherIndex: 21 },
-];
-
-const SECTION_STUDENTS = Array.from({ length: 21 }).flatMap((_, secIdx) =>
-  Array.from({ length: 10 }).map((_, i) => ({
-    sectionIndex: secIdx,
-    studentIndex: 22 + ((secIdx * 3 + i) % 30),
-  })),
-);
-
-const ACTIVITIES = [
-  // CSE 1111: Structured Programming Language
-  {
-    sectionIndex: 1,
-    title: 'Lab 01: Variables and Loops',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY,
-    endTime: NOW + ONE_DAY,
+    teacherIndices: [2], // Asnuva
+    studentIndices: [3, 4, 5],
   },
   {
-    sectionIndex: 1,
-    title: 'Lab 02: Functions and Arrays',
-    type: 'class' as const,
-    startTime: NOW - 2 * 60 * 60 * 1000,
-    endTime: NOW + 4 * 60 * 60 * 1000,
+    name: 'CSE 1115: Object Oriented Programming',
+    aboutMd: 'Deep dive into Java, inheritance, and polymorphism.',
+    teacherIndices: [1], // Sidratul
+    studentIndices: [3, 4, 6],
   },
   {
-    sectionIndex: 1,
-    title: 'Midterm Exam: Structured Programming',
-    type: 'exam' as const,
-    startTime: NOW - 30 * 60 * 1000,
-    endTime: NOW + 1 * 60 * 60 * 1000,
-  },
-
-  // CSE 1115: Object Oriented Programming
-  {
-    sectionIndex: 3,
-    title: 'Lab 01: Classes and Objects',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY * 4,
-    endTime: NOW - ONE_DAY * 3,
-  },
-  {
-    sectionIndex: 3,
-    title: 'Assignment 02: Inheritance and Polymorphism',
-    type: 'class' as const,
-    startTime: NOW,
-    endTime: NOW + ONE_DAY * 7,
-  },
-
-  // CSE 2215: Data Structure and Algorithms I
-  {
-    sectionIndex: 10,
-    title: 'Lab 01: Linked Lists',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY * 2,
-    endTime: NOW - ONE_DAY,
-  },
-  {
-    sectionIndex: 10,
-    title: 'Quiz 01: Complexity Analysis',
-    type: 'exam' as const,
-    startTime: NOW + ONE_DAY * 2,
-    endTime: NOW + ONE_DAY * 2 + 1 * 60 * 60 * 1000,
-  },
-
-  // CSE 2217: Data Structure and Algorithms II
-  {
-    sectionIndex: 12,
-    title: 'Lab 01: Graph Traversals',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY * 10,
-    endTime: NOW - ONE_DAY * 9,
-  },
-  {
-    sectionIndex: 12,
-    title: 'Assignment: Dynamic Programming',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY,
-    endTime: NOW + ONE_DAY * 5,
-  },
-
-  // CSE 3521: Database Management Systems
-  {
-    sectionIndex: 17,
-    title: 'Lab 01: SQL Basics',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY * 2,
-    endTime: NOW + ONE_DAY * 2,
-  },
-
-  // CSE 4509: Operating Systems
-  {
-    sectionIndex: 18,
-    title: 'Assignment: CPU Scheduling',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY * 3,
-    endTime: NOW + ONE_DAY * 3,
-  },
-
-  // CSE 3711: Computer Networks
-  {
-    sectionIndex: 19,
-    title: 'Quiz: IP Subnetting',
-    type: 'exam' as const,
-    startTime: NOW + ONE_DAY * 4,
-    endTime: NOW + ONE_DAY * 4 + 45 * 60 * 1000,
-  },
-
-  // CSE 3811: Artificial Intelligence
-  {
-    sectionIndex: 20,
-    title: 'Lab: BFS and DFS Implementation',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY * 1,
-    endTime: NOW + ONE_DAY * 4,
-  },
-
-  // Remaining Sections
-  {
-    sectionIndex: 0,
-    title: 'Quiz 01: Hardware Basics',
-    type: 'exam' as const,
-    startTime: NOW + ONE_DAY,
-    endTime: NOW + ONE_DAY + 30 * 60 * 1000,
-  },
-  {
-    sectionIndex: 2,
-    title: 'Lab: Pointers and Memory',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY * 2,
-    endTime: NOW + ONE_DAY,
-  },
-  {
-    sectionIndex: 4,
-    title: 'Lab: Java Collections',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY * 3,
-    endTime: NOW + ONE_DAY * 2,
-  },
-  {
-    sectionIndex: 5,
-    title: 'Assignment: Boolean Algebra',
-    type: 'class' as const,
-    startTime: NOW,
-    endTime: NOW + ONE_DAY * 5,
-  },
-  {
-    sectionIndex: 6,
-    title: 'Lab: Logic Gates Circuit',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY,
-    endTime: NOW + ONE_DAY * 3,
-  },
-  {
-    sectionIndex: 7,
-    title: 'Lab: MIPS Assembly Basics',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY * 4,
-    endTime: NOW - ONE_DAY * 2,
-  },
-  {
-    sectionIndex: 8,
-    title: 'Lab: 8086 Interfacing',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY,
-    endTime: NOW + ONE_DAY * 5,
-  },
-  {
-    sectionIndex: 9,
-    title: 'Quiz: Sets and Relations',
-    type: 'exam' as const,
-    startTime: NOW + ONE_DAY * 3,
-    endTime: NOW + ONE_DAY * 3 + 1 * 60 * 60 * 1000,
-  },
-  {
-    sectionIndex: 11,
-    title: 'Lab: Binary Search Trees',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY * 2,
-    endTime: NOW + ONE_DAY * 2,
-  },
-  {
-    sectionIndex: 13,
-    title: 'Assignment: NFA to DFA',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY * 5,
-    endTime: NOW - ONE_DAY * 1,
-  },
-  {
-    sectionIndex: 14,
-    title: 'Lab: UML Use Case Diagrams',
-    type: 'class' as const,
-    startTime: NOW,
-    endTime: NOW + ONE_DAY * 3,
-  },
-  {
-    sectionIndex: 15,
-    title: 'Quiz: Agile Methodology',
-    type: 'exam' as const,
-    startTime: NOW + ONE_DAY * 5,
-    endTime: NOW + ONE_DAY * 5 + 40 * 60 * 1000,
-  },
-  {
-    sectionIndex: 16,
-    title: 'Assignment: RSA Implementation',
-    type: 'class' as const,
-    startTime: NOW - ONE_DAY * 2,
-    endTime: NOW + ONE_DAY * 6,
+    name: 'CSE 2215: Data Structure and Algorithms I',
+    aboutMd: 'Linked lists, trees, and basic searching/sorting.',
+    teacherIndices: [2], // Asnuva
+    studentIndices: [3, 5, 7],
   },
 ];
 
 const PROBLEMS = [
   {
-    creatorIndex: 2, // Asnuva Tanvin
     title: 'Sum of Two Integers',
     contentMd: 'Read two integers and print their sum.',
-  }, // 0
-  {
     creatorIndex: 2,
+    ios: [{ input: '5 10', output: '15' }],
+  },
+  {
     title: 'Palindrome Checker',
-    contentMd: 'Write a program to check if a given string is a palindrome.',
-  }, // 1
-  {
+    contentMd: 'Write a program to check if a given string is a palindrome. Print "Yes" or "No".',
     creatorIndex: 2,
+    ios: [
+      { input: 'madam', output: 'Yes' },
+      { input: 'hello', output: 'No' },
+    ],
+  },
+  {
     title: 'Factorial Calculation',
     contentMd: 'Calculate the factorial of a given non-negative integer N.',
-  }, // 2
+    creatorIndex: 2,
+    ios: [{ input: '5', output: '120' }],
+  },
   {
-    creatorIndex: 4, // Osama Haque
     title: 'Bank Account Class',
     contentMd:
-      'Create a BankAccount class in Java with private fields balance and accountId. Implement deposit() and withdraw() methods.',
-  }, // 3
+      'Create a BankAccount class with private fields balance and accountId. Implement deposit() and withdraw().',
+    creatorIndex: 1,
+    ios: [{ input: 'deposit 100\nwithdraw 50', output: 'Balance: 50' }],
+  },
   {
-    creatorIndex: 4,
-    title: 'Shape Hierarchy',
-    contentMd:
-      'Implement a Shape interface and concrete classes Circle and Rectangle. Demonstrate polymorphism by calculating areas.',
-  }, // 4
-  {
-    creatorIndex: 11, // Tanvir Raihan
     title: 'Singly Linked List Reversal',
     contentMd: 'Given the head of a singly linked list, reverse the list and return its head.',
-  }, // 5
-  {
-    creatorIndex: 11,
-    title: 'Queue using Two Stacks',
-    contentMd: 'Implement a FIFO queue using only two stacks.',
-  }, // 6
-  {
-    creatorIndex: 13, // Tarek Hasan
-    title: 'Dijkstra Shortest Path',
-    contentMd: 'Implement Dijkstra algorithm to find the shortest path from a source node in a weighted graph.',
-  }, // 7
-  {
-    creatorIndex: 13,
-    title: '0/1 Knapsack Problem',
-    contentMd:
-      'Given weights and values of N items, put these items in a knapsack of capacity W to get the maximum total value.',
-  }, // 8
-  {
-    creatorIndex: 18, // Romizul Islam
-    title: 'Simple SQL Query',
-    contentMd: 'Write a SQL query to select all columns from the Employees table where Department is "Sales".',
-  }, // 9
-  {
     creatorIndex: 2,
-    title: 'Prime Number Generator',
-    contentMd: 'Print all prime numbers between 1 and N.',
-  }, // 10
-  {
-    creatorIndex: 19, // Romizul Islam
-    title: 'FCFS Scheduling',
-    contentMd: 'Calculate average waiting time for N processes using First Come First Served scheduling.',
-  }, // 11
-  {
-    creatorIndex: 20, // Farhan Anan Himu
-    title: 'Subnet Mask Calculator',
-    contentMd: 'Given an IP address and CIDR notation, find the subnet mask.',
-  }, // 12
-  {
-    creatorIndex: 21, // Shoib Ahmed Shourav
-    title: 'BFS Traversal',
-    contentMd: 'Implement Breadth First Search for a given adjacency list of a graph.',
-  }, // 13
-  {
-    creatorIndex: 1, // Sidratul Muntaha
-    title: 'Pointer Arithmetic',
-    contentMd: 'Write a C program to demonstrate pointer arithmetic by iterating over an array using pointers.',
-  }, // 14
-  {
-    creatorIndex: 6, // Humaira Anzum Neha
-    title: 'Logic Gate Simulator',
-    contentMd: 'Given inputs A and B, simulate the output of an XOR gate without using the XOR operator.',
-  }, // 15
-  {
-    creatorIndex: 8, // Charles Aunkan Gomes
-    title: 'MIPS Addition',
-    contentMd: 'Write a MIPS assembly snippet to add two numbers stored in registers $s0 and $s1.',
-  }, // 16
-  {
-    creatorIndex: 17, // Nabila Sabrin Sworna
-    title: 'RSA Key Generation',
-    contentMd: 'Implement the RSA key generation algorithm given two prime numbers p and q.',
-  }, // 17
-];
-
-const PROBLEM_IOS = [
-  { problemIndex: 0, inputData: '5 10', outputData: '15', ioOrder: 0 },
-  { problemIndex: 1, inputData: 'madam', outputData: 'Yes', ioOrder: 0 },
-  { problemIndex: 1, inputData: 'hello', outputData: 'No', ioOrder: 1 },
-  { problemIndex: 2, inputData: '5', outputData: '120', ioOrder: 0 },
-  { problemIndex: 5, inputData: '1->2->3', outputData: '3->2->1', ioOrder: 0 },
-  {
-    problemIndex: 9,
-    inputData: 'No input',
-    outputData: 'SELECT * FROM Employees WHERE Department = "Sales"',
-    ioOrder: 0,
-  },
-  { problemIndex: 10, inputData: '10', outputData: '2 3 5 7', ioOrder: 0 },
-  { problemIndex: 11, inputData: '3\n0 5\n1 3\n2 8', outputData: 'Average Waiting Time: 4.33', ioOrder: 0 },
-  { problemIndex: 12, inputData: '192.168.1.0/24', outputData: '255.255.255.0', ioOrder: 0 },
-  { problemIndex: 13, inputData: '0: 1,2\n1: 2\n2: 0,3\n3: 3', outputData: '0 1 2 3', ioOrder: 0 },
-  { problemIndex: 14, inputData: '1 2 3', outputData: '1 2 3', ioOrder: 0 },
-  { problemIndex: 15, inputData: '0 1', outputData: '1', ioOrder: 0 },
-  { problemIndex: 16, inputData: '$s0=5, $s1=10', outputData: '$v0=15', ioOrder: 0 },
-  { problemIndex: 17, inputData: '61 53', outputData: 'n=3233, e=65537', ioOrder: 0 },
-];
-
-const ACTIVITY_PROBLEMS = [
-  // SPL Lab 01: Variables and Loops
-  { activityIndex: 0, problemIndex: 0, problemOrder: 0 }, // Sum
-  { activityIndex: 0, problemIndex: 10, problemOrder: 1 }, // Prime
-
-  // SPL Lab 02: Functions and Arrays
-  { activityIndex: 1, problemIndex: 1, problemOrder: 0 }, // Palindrome
-  { activityIndex: 1, problemIndex: 2, problemOrder: 1 }, // Factorial
-
-  // SPL Midterm
-  { activityIndex: 2, problemIndex: 1, problemOrder: 0 }, // Palindrome (Reused)
-  { activityIndex: 2, problemIndex: 2, problemOrder: 1 }, // Factorial (Reused)
-  { activityIndex: 2, problemIndex: 10, problemOrder: 2 }, // Prime (Reused)
-
-  // OOP Lab 01
-  { activityIndex: 3, problemIndex: 3, problemOrder: 0 }, // Bank Account
-
-  // OOP Assignment 02
-  { activityIndex: 4, problemIndex: 4, problemOrder: 0 }, // Shape Hierarchy
-
-  // Data Structure Lab 01
-  { activityIndex: 5, problemIndex: 5, problemOrder: 0 }, // Linked List
-  { activityIndex: 5, problemIndex: 6, problemOrder: 1 }, // Queue
-
-  // Data Structure Quiz 01
-  { activityIndex: 6, problemIndex: 0, problemOrder: 0 }, // Sum (Reused for trivial complexity check)
-
-  // Algorithms II Lab 01
-  { activityIndex: 7, problemIndex: 7, problemOrder: 0 }, // Dijkstra
-
-  // Algorithms II Assignment
-  { activityIndex: 8, problemIndex: 8, problemOrder: 0 }, // Knapsack
-
-  // Database Lab 01
-  { activityIndex: 9, problemIndex: 9, problemOrder: 0 }, // SQL Query
-
-  // OS Assignment
-  { activityIndex: 10, problemIndex: 11, problemOrder: 0 }, // FCFS
-
-  // Networks Quiz
-  { activityIndex: 11, problemIndex: 12, problemOrder: 0 }, // Subnetting
-
-  // AI Lab
-  { activityIndex: 12, problemIndex: 13, problemOrder: 0 }, // BFS
-
-  // Remaining joins
-  { activityIndex: 13, problemIndex: 0, problemOrder: 0 }, // Quiz Hardware -> Sum (trivial)
-  { activityIndex: 14, problemIndex: 14, problemOrder: 0 }, // Pointers
-  { activityIndex: 15, problemIndex: 3, problemOrder: 0 }, // Java Collections -> Bank Account
-  { activityIndex: 16, problemIndex: 15, problemOrder: 0 }, // Boolean Algebra -> Logic Gate
-  { activityIndex: 17, problemIndex: 15, problemOrder: 0 }, // Logic Gates Lab
-  { activityIndex: 18, problemIndex: 16, problemOrder: 0 }, // MIPS Assembly
-  { activityIndex: 19, problemIndex: 16, problemOrder: 0 }, // 8086 Interfacing
-  { activityIndex: 20, problemIndex: 15, problemOrder: 0 }, // Sets -> Logic Gate (trivial)
-  { activityIndex: 21, problemIndex: 5, problemOrder: 0 }, // Binary Tree -> Linked List (reused)
-  { activityIndex: 22, problemIndex: 13, problemOrder: 0 }, // NFA -> BFS (reused)
-  { activityIndex: 23, problemIndex: 9, problemOrder: 0 }, // UML -> SQL (trivial)
-  { activityIndex: 24, problemIndex: 11, problemOrder: 0 }, // Agile -> FCFS (trivial)
-  { activityIndex: 25, problemIndex: 17, problemOrder: 0 }, // RSA
-];
-
-const TAGS = [{ name: 'C/C++' }, { name: 'Java' }, { name: 'Exam-Help' }];
-
-const POSTS = [
-  { authorIndex: 26, contentMd: 'What does SIGSEGV mean? Getting this error on the Array Assignment.' },
-  { authorIndex: 4, contentMd: 'Welcome to CSE 1115: OOP. Please check the syllabus attached.' },
-];
-
-const POST_TAGS = [
-  { postIndex: 0, tagIndex: 0 },
-  { postIndex: 1, tagIndex: 1 },
-];
-
-const COMMENTS = [
-  {
-    authorIndex: 2,
-    postIndex: 0,
-    content: 'Segmentation Fault usually means you are trying to access an array index out of bounds.',
-    parentCommentIndex: null,
+    ios: [{ input: '1 2 3', output: '3 2 1' }],
   },
 ];
 
-const CHATS = [{ name: 'CSE 1111 - General Support' }];
-
-const CHAT_MEMBERS = [
-  { chatIndex: 0, userIndex: 2 }, // Teacher
-  { chatIndex: 0, userIndex: 26 }, // Student
-  { chatIndex: 0, userIndex: 27 }, // Student
+const ACTIVITIES = [
+  {
+    sectionIndex: 0, // SPL
+    title: 'Lab 01: Variables and Loops',
+    type: 'class' as const,
+    startTime: NOW - ONE_DAY,
+    endTime: NOW + ONE_DAY,
+    problemIndices: [0, 2], // Sum, Factorial
+  },
+  {
+    sectionIndex: 0, // SPL
+    title: 'Midterm Exam',
+    type: 'exam' as const,
+    startTime: NOW + ONE_HOUR,
+    endTime: NOW + 3 * ONE_HOUR,
+    problemIndices: [1], // Palindrome
+  },
+  {
+    sectionIndex: 1, // OOP
+    title: 'Lab 01: Classes',
+    type: 'class' as const,
+    startTime: NOW - 2 * ONE_DAY,
+    endTime: NOW - ONE_DAY,
+    problemIndices: [3], // Bank
+  },
+  {
+    sectionIndex: 2, // DSA
+    title: 'Lab 01: Lists',
+    type: 'class' as const,
+    startTime: NOW - ONE_HOUR,
+    endTime: NOW + 4 * ONE_HOUR,
+    problemIndices: [4], // Linked List
+  },
 ];
 
-const MESSAGES = [
-  { chatIndex: 0, senderIndex: 2, content: 'Welcome to the support channel for SPL. Ask your doubts here.' },
-  { chatIndex: 0, senderIndex: 26, content: 'Sir, will the assignment deadline be extended?' },
+// --- CODE CONTENT ---
+
+const SUM_STEPS = [
+  `a, b = map(int, input().split())\n`,
+  `a, b = map(int, input().split())\nresult = a + b\n`,
+  `a, b = map(int, input().split())\nresult = a + b\nprint(result)\n`,
+];
+
+const REV_STEPS = [
+  `class Node:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n`,
+  `class Node:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef reverse(head):\n    prev = None\n    curr = head\n`,
+  `class Node:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef reverse(head):\n    prev = None\n    curr = head\n    while curr:\n        nxt = curr.next\n        curr.next = prev\n        prev = curr\n        curr = nxt\n    return prev\n`,
 ];
 
 // --- SEEDING LOGIC ---
@@ -622,9 +159,7 @@ const MESSAGES = [
 export default internalMutation({
   args: {},
   handler: async (ctx) => {
-    const now = Date.now();
-
-    // 1. WIPE EVERYTHING
+    // 1. WIPE
     console.log('Wiping existing data...');
     for (const table of TABLES) {
       const docs = await ctx.db.query(table as TableNames).collect();
@@ -633,156 +168,187 @@ export default internalMutation({
       }
     }
 
-    // 2. SEED USERS (WITH DYNAMIC AVATARS)
+    // 2. USERS
+    console.log('Seeding users...');
     const userIds: Id<'users'>[] = [];
     for (const u of USERS) {
-      const userId = await ctx.db.insert('users', {
+      const id = await ctx.db.insert('users', {
         ...u,
+        passwordHash: DEFAULT_PASS,
         avatarUrl: avatar(u.email),
-        createdAt: now,
-        updatedAt: now,
+        createdAt: NOW,
+        updatedAt: NOW,
       });
-      userIds.push(userId);
+      userIds.push(id);
     }
 
-    // 3. SEED SECTIONS
+    // 3. SECTIONS
+    console.log('Seeding sections...');
     const sectionIds: Id<'sections'>[] = [];
     for (const s of SECTIONS) {
-      const sectionId = await ctx.db.insert('sections', { ...s, createdAt: now, updatedAt: now });
+      const { teacherIndices, studentIndices, ...data } = s;
+      const sectionId = await ctx.db.insert('sections', { ...data, createdAt: NOW, updatedAt: NOW });
       sectionIds.push(sectionId);
+
+      for (const tIdx of teacherIndices) {
+        await ctx.db.insert('sectionTeachers', { sectionId, teacherId: userIds[tIdx], createdAt: NOW });
+      }
+      for (const sIdx of studentIndices) {
+        await ctx.db.insert('sectionStudents', { sectionId, studentId: userIds[sIdx], createdAt: NOW });
+      }
     }
 
-    // 4. JOIN TEACHERS & STUDENTS
-    for (const st of SECTION_TEACHERS) {
-      await ctx.db.insert('sectionTeachers', {
-        sectionId: sectionIds[st.sectionIndex],
-        teacherId: userIds[st.teacherIndex],
-        createdAt: now,
-      });
-    }
-    for (const ss of SECTION_STUDENTS) {
-      await ctx.db.insert('sectionStudents', {
-        sectionId: sectionIds[ss.sectionIndex],
-        studentId: userIds[ss.studentIndex],
-        createdAt: now,
-      });
-    }
-
-    // 5. SEED ACTIVITIES
-    const activityIds: Id<'activities'>[] = [];
-    for (const a of ACTIVITIES) {
-      const { sectionIndex, ...fields } = a;
-      const activityId = await ctx.db.insert('activities', {
-        ...fields,
-        sectionId: sectionIds[sectionIndex],
-        createdAt: now,
-        updatedAt: now,
-      });
-      activityIds.push(activityId);
-    }
-
-    // 6. SEED PROBLEMS & TEST CASES
+    // 4. PROBLEMS & IO
+    console.log('Seeding problems...');
     const problemIds: Id<'problems'>[] = [];
     for (const p of PROBLEMS) {
-      const { creatorIndex, ...fields } = p;
+      const { ios, creatorIndex, ...data } = p;
       const problemId = await ctx.db.insert('problems', {
-        ...fields,
+        ...data,
         createdBy: userIds[creatorIndex],
-        createdAt: now,
-        updatedAt: now,
+        createdAt: NOW,
+        updatedAt: NOW,
       });
       problemIds.push(problemId);
-    }
-    for (const io of PROBLEM_IOS) {
-      const { problemIndex, ...fields } = io;
-      await ctx.db.insert('problemIos', { ...fields, problemId: problemIds[problemIndex] });
+
+      for (let i = 0; i < ios.length; i++) {
+        await ctx.db.insert('problemIos', {
+          problemId,
+          inputData: ios[i].input,
+          outputData: ios[i].output,
+          ioOrder: i,
+        });
+      }
     }
 
-    // 7. JOIN ACTIVITIES & PROBLEMS
-    for (const ap of ACTIVITY_PROBLEMS) {
-      await ctx.db.insert('activityProblems', {
-        activityId: activityIds[ap.activityIndex],
-        problemId: problemIds[ap.problemIndex],
-        problemOrder: ap.problemOrder,
-        createdAt: now,
+    // 5. ACTIVITIES & JOIN PROBLEMS
+    console.log('Seeding activities...');
+    const activityIds: Id<'activities'>[] = [];
+    for (const a of ACTIVITIES) {
+      const { sectionIndex, problemIndices, ...data } = a;
+      const activityId = await ctx.db.insert('activities', {
+        ...data,
+        sectionId: sectionIds[sectionIndex],
+        createdAt: NOW,
+        updatedAt: NOW,
+      });
+      activityIds.push(activityId);
+
+      for (let i = 0; i < problemIndices.length; i++) {
+        await ctx.db.insert('activityProblems', {
+          activityId,
+          problemId: problemIds[problemIndices[i]],
+          problemOrder: i,
+          createdAt: NOW,
+        });
+      }
+    }
+
+    // 6. SNAPSHOTS & SUBMISSIONS (Realism for ffaisal23 and rhasan21)
+    console.log('Seeding history...');
+    const ffaisal = userIds[3];
+    const rhasan = userIds[4];
+
+    // ffaisal completes Sum in SPL Lab 01
+    const act0 = activityIds[0];
+    const prob0 = problemIds[0];
+    for (let i = 0; i < SUM_STEPS.length; i++) {
+      await ctx.db.insert('snapshots', {
+        authorId: ffaisal,
+        activityId: act0,
+        problemId: prob0,
+        content: SUM_STEPS[i],
+        languageId: 71,
+        timestamp: NOW - ONE_DAY + i * 5 * 60000,
       });
     }
+    await ctx.db.insert('submissions', {
+      authorId: ffaisal,
+      activityId: act0,
+      problemId: prob0,
+      content: SUM_STEPS[2],
+      languageId: 71,
+      judgeVerdict: 'Accepted',
+      submittedAt: NOW - ONE_DAY + 20 * 60000,
+    });
 
-    // 8. SEED TAGS, POSTS & COMMENTS
-    const tagIds: Id<'tags'>[] = [];
-    for (const t of TAGS) {
-      tagIds.push(await ctx.db.insert('tags', t));
-    }
-
-    const postIds: Id<'posts'>[] = [];
-    for (const p of POSTS) {
-      const { authorIndex, ...fields } = p;
-      const postId = await ctx.db.insert('posts', {
-        ...fields,
-        authorId: userIds[authorIndex],
-        createdAt: now,
-        updatedAt: now,
-      });
-      postIds.push(postId);
-    }
-
-    for (const pt of POST_TAGS) {
-      await ctx.db.insert('postTags', {
-        postId: postIds[pt.postIndex],
-        tagId: tagIds[pt.tagIndex],
+    // ffaisal completes Linked List in DSA Lab 01
+    const act3 = activityIds[3];
+    const prob4 = problemIds[4];
+    for (let i = 0; i < REV_STEPS.length; i++) {
+      await ctx.db.insert('snapshots', {
+        authorId: ffaisal,
+        activityId: act3,
+        problemId: prob4,
+        content: REV_STEPS[i],
+        languageId: 71,
+        timestamp: NOW - 30 * 60000 + i * 10 * 60000,
       });
     }
+    await ctx.db.insert('submissions', {
+      authorId: ffaisal,
+      activityId: act3,
+      problemId: prob4,
+      content: REV_STEPS[2],
+      languageId: 71,
+      judgeVerdict: 'Accepted',
+      submittedAt: NOW,
+    });
 
-    const commentIds: Id<'comments'>[] = [];
-    for (const c of COMMENTS) {
-      const { authorIndex, postIndex, parentCommentIndex, ...fields } = c;
-      const commentId = await ctx.db.insert('comments', {
-        ...fields,
-        authorId: userIds[authorIndex],
-        postId: postIds[postIndex],
-        parentCommentId: parentCommentIndex !== null ? commentIds[parentCommentIndex] : undefined,
-        createdAt: now,
-        updatedAt: now,
-      });
-      commentIds.push(commentId);
-    }
+    // rhasan struggles with Sum
+    await ctx.db.insert('snapshots', {
+      authorId: rhasan,
+      activityId: act0,
+      problemId: prob0,
+      content: 'print("hello")',
+      languageId: 71,
+      timestamp: NOW - ONE_DAY + 2 * 60000,
+    });
+    await ctx.db.insert('submissions', {
+      authorId: rhasan,
+      activityId: act0,
+      problemId: prob0,
+      content: 'print("hello")',
+      languageId: 71,
+      judgeVerdict: 'Wrong Answer',
+      submittedAt: NOW - ONE_DAY + 10 * 60000,
+    });
 
-    // 9. SEED CHATS & MESSAGES
-    const chatIds: Id<'chats'>[] = [];
-    for (const c of CHATS) {
-      chatIds.push(await ctx.db.insert('chats', { ...c, createdAt: now }));
-    }
+    // 7. SOCIAL
+    console.log('Seeding social...');
+    const tag1 = await ctx.db.insert('tags', { name: 'Python' });
+    const tag2 = await ctx.db.insert('tags', { name: 'Help' });
 
-    for (const cm of CHAT_MEMBERS) {
-      const { chatIndex, userIndex } = cm;
-      await ctx.db.insert('chatMembers', {
-        chatId: chatIds[chatIndex],
-        userId: userIds[userIndex],
-        joinedAt: now,
-      });
-    }
+    const post1 = await ctx.db.insert('posts', {
+      authorId: rhasan,
+      contentMd: 'Is it okay to use recursion for the factorial problem? Will it hit stack limits?',
+      createdAt: NOW - 2 * ONE_HOUR,
+      updatedAt: NOW - 2 * ONE_HOUR,
+    });
+    await ctx.db.insert('postTags', { postId: post1, tagId: tag1 });
+    await ctx.db.insert('postTags', { postId: post1, tagId: tag2 });
 
-    for (const m of MESSAGES) {
-      const { chatIndex, senderIndex, ...fields } = m;
-      await ctx.db.insert('messages', {
-        ...fields,
-        chatId: chatIds[chatIndex],
-        senderId: userIds[senderIndex],
-        sentAt: now,
-      });
-    }
+    await ctx.db.insert('comments', {
+      authorId: userIds[2], // Asnuva
+      postId: post1,
+      content:
+        'For N=100, recursion is fine. For larger values, you might need to increase the limit or use iteration.',
+      createdAt: NOW - ONE_HOUR,
+      updatedAt: NOW - ONE_HOUR,
+    });
+
+    const chat1 = await ctx.db.insert('chats', { name: 'CSE 1111 - SPL Support', createdAt: NOW });
+    await ctx.db.insert('chatMembers', { chatId: chat1, userId: userIds[2], joinedAt: NOW });
+    await ctx.db.insert('chatMembers', { chatId: chat1, userId: ffaisal, joinedAt: NOW });
+    await ctx.db.insert('chatMembers', { chatId: chat1, userId: rhasan, joinedAt: NOW });
+
+    await ctx.db.insert('messages', {
+      chatId: chat1,
+      senderId: userIds[2],
+      content: 'Welcome to the SPL support group!',
+      sentAt: NOW - ONE_HOUR,
+    });
 
     console.log('Seeding complete!');
-    return {
-      status: 'success',
-      recordsCreated: {
-        users: userIds.length,
-        sections: sectionIds.length,
-        activities: activityIds.length,
-        problems: problemIds.length,
-        posts: postIds.length,
-        chats: chatIds.length,
-      },
-    };
   },
 });

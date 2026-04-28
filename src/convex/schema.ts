@@ -78,6 +78,7 @@ export default defineSchema({
     activityId: v.id('activities'),
     timestamp: v.number(),
     content: v.string(),
+    languageId: v.optional(v.number()),
   })
     .index('by_author', ['authorId'])
     .index('by_activity_problem', ['activityId', 'problemId'])
@@ -88,6 +89,7 @@ export default defineSchema({
     problemId: v.id('problems'),
     activityId: v.id('activities'),
     content: v.string(),
+    languageId: v.optional(v.number()),
     judgeVerdict: v.optional(v.string()),
     submittedAt: v.number(),
   })
