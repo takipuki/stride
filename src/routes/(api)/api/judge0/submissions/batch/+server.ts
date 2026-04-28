@@ -11,7 +11,7 @@ import {
 import type { RequestHandler } from './$types';
 
 /** POST /api/judge0/submissions/batch — create batch submissions */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, url }) => {
   let body: { submissions: SubmissionInput[] };
   try {
     body = await request.json();
@@ -27,13 +27,24 @@ export const POST: RequestHandler = async ({ request }) => {
     submissions: body.submissions.map(buildSubmissionPayload),
   };
 
-  const res = await judge0Fetch('/submissions/batch?base64_encoded=true', {
+  const wait = url.searchParams.get('wait');
+  const queryString =
+    wait === 'true' ? `?base64_encoded=true&wait=true&fields=${SUBMISSION_FIELDS}` : '?base64_encoded=true';
+
+  const res = await judge0Fetch(`/submissions/batch${queryString}`, {
     method: 'POST',
     body: JSON.stringify(payload),
   });
 
   const data = await res.json();
   if (!res.ok) throw error(res.status, JSON.stringify(data));
+
+  if (wait === 'true') {
+    return json(
+      { submissions: (data as Record<string, unknown>[]).map((sub) => decodeSubmissionResult(sub)) },
+      { status: res.status },
+    );
+  }
 
   return json(data, { status: res.status });
 };

@@ -22,7 +22,7 @@
     result = null;
 
     try {
-      const submitRes = await fetch('/api/judge0/submissions', {
+      const submitRes = await fetch('/api/judge0/submissions?wait=true', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -34,23 +34,7 @@
 
       if (!submitRes.ok) throw new Error('Submission failed');
 
-      const submitData = await submitRes.json();
-      const token = submitData.token;
-
-      let statusId = 1;
-      while (statusId === 1 || statusId === 2) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const pollRes = await fetch(`/api/judge0/submissions/${token}`);
-        if (pollRes.ok) {
-          const pollData = await pollRes.json();
-          statusId = pollData.status.id;
-          if (statusId !== 1 && statusId !== 2) {
-            result = pollData;
-          }
-        } else {
-          throw new Error('Polling failed');
-        }
-      }
+      result = await submitRes.json();
 
       if (result?.compile_output) {
         activeTab = 'compile_output';
@@ -160,11 +144,28 @@
                       </Tabs.Content>
                       <Tabs.Content value="message" class="m-0 h-full outline-none">
                         <pre class="whitespace-pre-wrap">{result.message || 'No additional messages'}</pre>
-                        {#if result.status}
-                          <div class="mt-2 text-xs font-semibold">
-                            Status: {result.status.description}
-                          </div>
-                        {/if}
+                        <div class="mt-4 grid grid-cols-[100px_1fr] gap-1 text-xs">
+                          {#if result.status}
+                            <div class="font-semibold text-muted-foreground">Status:</div>
+                            <div>{result.status.description}</div>
+                          {/if}
+                          {#if result.time != null}
+                            <div class="font-semibold text-muted-foreground">Time:</div>
+                            <div>{result.time} s</div>
+                          {/if}
+                          {#if result.wall_time != null}
+                            <div class="font-semibold text-muted-foreground">Wall Time:</div>
+                            <div>{result.wall_time} s</div>
+                          {/if}
+                          {#if result.memory != null}
+                            <div class="font-semibold text-muted-foreground">Memory:</div>
+                            <div>{(result.memory / 1024).toFixed(2)} MB</div>
+                          {/if}
+                          {#if result.exit_code != null}
+                            <div class="font-semibold text-muted-foreground">Exit Code:</div>
+                            <div>{result.exit_code}</div>
+                          {/if}
+                        </div>
                       </Tabs.Content>
                     {/if}
                   </div>

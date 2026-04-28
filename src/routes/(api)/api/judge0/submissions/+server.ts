@@ -1,11 +1,17 @@
 import { error, json } from '@sveltejs/kit';
 
-import { buildSubmissionPayload, judge0Fetch, type SubmissionInput } from '$lib/server/judge0';
+import {
+  buildSubmissionPayload,
+  decodeSubmissionResult,
+  judge0Fetch,
+  SUBMISSION_FIELDS,
+  type SubmissionInput,
+} from '$lib/server/judge0';
 
 import type { RequestHandler } from './$types';
 
 /** POST /api/judge0/submissions — create a new submission */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, url }) => {
   let body: SubmissionInput;
   try {
     body = await request.json();
@@ -19,7 +25,11 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const payload = buildSubmissionPayload(body);
 
-  const res = await judge0Fetch('/submissions?base64_encoded=true', {
+  const wait = url.searchParams.get('wait');
+  const queryString =
+    wait === 'true' ? `?base64_encoded=true&wait=true&fields=${SUBMISSION_FIELDS}` : '?base64_encoded=true';
+
+  const res = await judge0Fetch(`/submissions${queryString}`, {
     method: 'POST',
     body: JSON.stringify(payload),
   });
@@ -28,6 +38,10 @@ export const POST: RequestHandler = async ({ request }) => {
 
   if (!res.ok) {
     throw error(res.status, JSON.stringify(data));
+  }
+
+  if (wait === 'true') {
+    return json(decodeSubmissionResult(data), { status: res.status });
   }
 
   return json(data, { status: res.status });
