@@ -35,7 +35,8 @@ This document outlines the URL structure for the application and what each page 
 - `/(app)/activities/[activityId]/edit/+page.svelte` — Update activity settings, attach and reorder problems.
 - `/(app)/activities/[activityId]/results/+page.svelte` — Scoreboard showing all student submissions and grades.
 - `/(app)/activities/[activityId]/cctv/+page.svelte` — Live grid view of all student screenshares.
-- `/(app)/activities/[activityId]/playback/[studentId]/+page.svelte` — Playback of a student's code snapshots.
+- `/(app)/activities/[activityId]/playback/+page.svelte` — Dashboard for reviewing student code progression.
+- `/(app)/activities/[activityId]/playback/[problemId]/[studentId]/+page.svelte` — Playback of a student's code snapshots for a specific problem.
 
 ### Problems (Question Bank)
 
@@ -50,3 +51,7 @@ This document outlines the URL structure for the application and what each page 
 - `/(app)/forum/new/+page.svelte` — Create a new forum post.
 - `/(app)/forum/[postId]/+page.svelte` — View a specific post and its comments.
 - `/(app)/chat/+page.svelte` — Full-page chat application (left sidebar for chats, right for messages).
+
+## API Routes `(api)`
+
+- `/(api)/api/judge0/...` — Proxies for Judge0 code execution engine (languages, submissions, statistics, etc.).

@@ -46,12 +46,8 @@
       {#each sections as section (section?._id)}
         {#if section}
           {@const activitiesQuery = useQuery(api.activities.listBySection, () => ({ sectionId: section._id }))}
-          {@const studentsQuery = useQuery(api.sections.listStudents, () =>
-            session.role === 'teacher' ? { sectionId: section._id } : 'skip',
-          )}
           {@const now = Date.now()}
           {@const activeActivities = (activitiesQuery.data ?? []).filter((a) => a.startTime <= now && now <= a.endTime)}
-          {@const firstStudentId = studentsQuery.data?.[0]?._id ?? 'unknown'}
 
           <Collapsible.Root class="group/collapsible">
             {#snippet child({ props })}
@@ -144,7 +140,7 @@
                           <Sidebar.MenuSubItem>
                             <Sidebar.MenuSubButton>
                               {#snippet child({ props })}
-                                <a href="/activities/{activity._id}/playback/{firstStudentId}" {...props}>
+                                <a href="/activities/{activity._id}/playback" {...props}>
                                   <PlayCircleIcon class="size-3 shrink-0 text-sidebar-foreground/60" />
                                   <span class="truncate text-xs text-sidebar-foreground/60"> Playback </span>
                                 </a>

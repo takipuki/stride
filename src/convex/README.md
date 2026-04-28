@@ -17,16 +17,16 @@ All timestamps are epoch milliseconds (`v.number()`).
 | createdAt    | number                    |                    |
 | updatedAt    | number                    | set on every patch |
 
-Indexes: `by_name`
+Indexes: `by_name`, `by_email`
 
-**Mutations** — `users.ts`
+**Functions** — `users.ts`
 
-- `create(name, passwordHash, role, aboutMd?, avatarUrl?)` → id
+- `create(name, email, passwordHash, role, aboutMd?, avatarUrl?)` → id
+- `login(email, passwordHash)` → user (session data)
 - `updateProfile(id, name?, aboutMd?, avatarUrl?)` → bumps updatedAt
 - `updatePassword(id, passwordHash)` → bumps updatedAt
 - `remove(id)`
 - `get(id)` → user
-- `getByName(name)` → user (login lookup)
 - `listByRole(role)` → users[]
 
 ---
@@ -40,7 +40,7 @@ Indexes: `by_name`
 | createdAt | number  |                    |
 | updatedAt | number  | set on every patch |
 
-**Mutations** — `sections.ts`
+**Functions** — `sections.ts`
 
 - `create(name, aboutMd?)` → id
 - `update(id, name?, aboutMd?)` → bumps updatedAt
@@ -60,7 +60,7 @@ Indexes: `by_name`
 
 Indexes: `by_section`, `by_teacher`
 
-**Mutations** — `sections.ts`
+**Functions** — `sections.ts`
 
 - `addTeacher(sectionId, teacherId)` → id (no-op if already exists)
 - `removeTeacher(sectionId, teacherId)`
@@ -79,7 +79,7 @@ Indexes: `by_section`, `by_teacher`
 
 Indexes: `by_section`, `by_student`
 
-**Mutations** — `sections.ts`
+**Functions** — `sections.ts`
 
 - `addStudent(sectionId, studentId)` → id (no-op if already exists)
 - `removeStudent(sectionId, studentId)`
@@ -102,7 +102,7 @@ Indexes: `by_section`, `by_student`
 
 Indexes: `by_section`
 
-**Mutations** — `activities.ts`
+**Functions** — `activities.ts`
 
 - `create(sectionId, title, startTime, endTime, type)` → id
 - `update(id, title?, startTime?, endTime?, type?)` → bumps updatedAt
@@ -123,7 +123,7 @@ Indexes: `by_section`
 
 Indexes: `by_activity`, `by_problem`
 
-**Mutations** — `activities.ts`
+**Functions** — `activities.ts`
 
 - `addProblem(activityId, problemId, problemOrder)` → id (no-op if exists)
 - `removeProblem(activityId, problemId)`
@@ -144,7 +144,7 @@ Indexes: `by_activity`, `by_problem`
 
 Indexes: `by_creator`
 
-**Mutations** — `problems.ts`
+**Functions** — `problems.ts`
 
 - `create(createdBy, title, contentMd)` → id
 - `update(id, title?, contentMd?)` → bumps updatedAt
@@ -166,7 +166,7 @@ Indexes: `by_creator`
 
 Indexes: `by_problem`
 
-**Mutations** — `problems.ts`
+**Functions** — `problems.ts`
 
 - `addIO(problemId, inputData, outputData, ioOrder)` → id
 - `updateIO(id, inputData?, outputData?, ioOrder?)`
@@ -184,12 +184,13 @@ Indexes: `by_problem`
 | activityId | id → activities | FK                  |
 | timestamp  | number          | epoch ms, immutable |
 | content    | string          | code content        |
+| languageId | number?         | Judge0 language ID  |
 
 Indexes: `by_author`, `by_activity_problem`, `by_author_activity_problem`
 
-**Mutations** — `snapshots.ts`
+**Functions** — `snapshots.ts`
 
-- `save(authorId, problemId, activityId, content)` → id
+- `save(authorId, problemId, activityId, content, languageId?)` → id
 - `getLatest(authorId, activityId, problemId)` → snapshot (most recent)
 - `listByAuthor(authorId, activityId, problemId)` → snapshots[] asc (replay/history)
 - `listByActivityProblem(activityId, problemId)` → snapshots[] (teacher view, all students)
@@ -204,14 +205,15 @@ Indexes: `by_author`, `by_activity_problem`, `by_author_activity_problem`
 | problemId    | id → problems   | FK                  |
 | activityId   | id → activities | FK                  |
 | content      | string          | submitted code      |
+| languageId   | number?         | Judge0 language ID  |
 | judgeVerdict | string?         | null until judged   |
 | submittedAt  | number          | epoch ms, immutable |
 
 Indexes: `by_author`, `by_activity`, `by_activity_problem`, `by_author_activity_problem`
 
-**Mutations** — `submissions.ts`
+**Functions** — `submissions.ts`
 
-- `submit(authorId, problemId, activityId, content)` → id
+- `submit(authorId, problemId, activityId, content, languageId?)` → id
 - `setVerdict(id, judgeVerdict)`
 - `remove(id)`
 - `get(id)` → submission
@@ -229,7 +231,7 @@ Indexes: `by_author`, `by_activity`, `by_activity_problem`, `by_author_activity_
 | name      | string |       |
 | createdAt | number |       |
 
-**Mutations** — `chats.ts`
+**Functions** — `chats.ts`
 
 - `create(name, memberIds[])` → chatId (also inserts chatMembers)
 - `rename(id, name)`
@@ -249,7 +251,7 @@ Indexes: `by_author`, `by_activity`, `by_activity_problem`, `by_author_activity_
 
 Indexes: `by_chat`, `by_user`
 
-**Mutations** — `chats.ts`
+**Functions** — `chats.ts`
 
 - `addMember(chatId, userId)` → id (no-op if exists)
 - `removeMember(chatId, userId)`
@@ -268,7 +270,7 @@ Indexes: `by_chat`, `by_user`
 
 Indexes: `by_chat`
 
-**Mutations** — `messages.ts`
+**Functions** — `messages.ts`
 
 - `send(chatId, senderId, content)` → id
 - `edit(id, content)`
@@ -288,7 +290,7 @@ Indexes: `by_chat`
 
 Indexes: `by_author`
 
-**Mutations** — `posts.ts`
+**Functions** — `posts.ts`
 
 - `create(authorId, contentMd, tagIds[]?)` → id (also inserts postTags)
 - `update(id, contentMd?)` → bumps updatedAt
@@ -308,7 +310,7 @@ Indexes: `by_author`
 
 Indexes: `by_name`
 
-**Mutations** — `posts.ts`
+**Functions** — `posts.ts`
 
 - `createTag(name)` → id (no-op if exists)
 - `listTags()` → tags[]
@@ -324,7 +326,7 @@ Indexes: `by_name`
 
 Indexes: `by_post`, `by_tag`
 
-**Mutations** — `posts.ts`
+**Functions** — `posts.ts`
 
 - `addTag(postId, tagId)` → id (no-op if exists)
 - `removeTag(postId, tagId)`
@@ -344,7 +346,7 @@ Indexes: `by_post`, `by_tag`
 
 Indexes: `by_post`, `by_parent`
 
-**Mutations** — `comments.ts`
+**Functions** — `comments.ts`
 
 - `create(authorId, postId, content, parentCommentId?)` → id
 - `update(id, content)` → bumps updatedAt
