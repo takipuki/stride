@@ -49,6 +49,7 @@
   const client = useConvexClient();
 
   const activityQuery = useQuery(api.activities.get, () => ({ id: activityId }));
+  const problemQuery = useQuery(api.problems.get, () => ({ id: problemId }));
   const studentQuery = useQuery(api.users.get, () => ({ id: studentId }));
   const snapshotsQuery = useQuery(api.snapshots.listByAuthor, () => ({
     authorId: studentId,
@@ -61,6 +62,8 @@
   const testCasesQuery = useQuery(api.problems.listIO, () => ({ problemId }));
 
   // ─── Derived data ──────────────────────────────────────────────────────────
+  const activity = $derived(activityQuery.data);
+  const problem = $derived(problemQuery.data);
   const student = $derived(studentQuery.data);
   const snapshots = $derived(snapshotsQuery.data ?? []);
   const totalSnapshots = $derived(snapshots.length);
@@ -312,6 +315,22 @@
     <!-- ═══ LEFT PANE: Code Viewer + Controls + Student Bar ═══ -->
     <Resizable.Pane defaultSize={65} minSize={35}>
       <div class="flex h-full flex-col">
+        <!-- Problem Header -->
+        <div class="flex items-center justify-between border-b px-4 py-3">
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm font-semibold">
+              {#if problem}
+                {problem.title}
+              {:else}
+                <Skeleton class="h-4 w-32" />
+              {/if}
+            </h1>
+          </div>
+          {#if activity}
+            <span class="text-xs text-muted-foreground">{activity.title}</span>
+          {/if}
+        </div>
+
         <!-- Code Viewer -->
         <div class="relative flex-1 overflow-auto bg-muted/20 p-4">
           {#if highlighter && totalSnapshots > 0}
