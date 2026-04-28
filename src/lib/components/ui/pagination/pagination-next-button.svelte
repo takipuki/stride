@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
   import { Pagination as PaginationPrimitive } from 'bits-ui';
+  import CaretRightIcon from 'phosphor-svelte/lib/CaretRight';
 
   import { cn } from '$lib/utils.js';
 
@@ -16,7 +16,7 @@
 
 {#snippet Fallback()}
   <span>Next</span>
-  <ChevronRightIcon class="size-4" />
+  <CaretRightIcon class={cn('size-4', className)} />
 {/snippet}
 
 <PaginationPrimitive.NextButton

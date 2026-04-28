@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ChevronLeftIcon from '@lucide/svelte/icons/chevron-left';
   import { Pagination as PaginationPrimitive } from 'bits-ui';
+  import CaretLeftIcon from 'phosphor-svelte/lib/CaretLeft';
 
   import { cn } from '$lib/utils.js';
 
@@ -15,7 +15,7 @@
 </script>
 
 {#snippet Fallback()}
-  <ChevronLeftIcon class="size-4" />
+  <CaretLeftIcon class={cn('size-4', className)} />
   <span>Previous</span>
 {/snippet}
 

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
   import { Calendar as CalendarPrimitive } from 'bits-ui';
+  import CaretDownIcon from 'phosphor-svelte/lib/CaretDown';
 
   import { cn, type WithoutChildrenOrChild } from '$lib/utils.js';
 
@@ -40,7 +40,7 @@
         aria-hidden="true"
       >
         {monthItems.find((item) => item.value === value)?.label || selectedMonthItem.label}
-        <ChevronDownIcon class="size-4" />
+        <CaretDownIcon class={cn('size-4', className)} />
       </span>
     {/snippet}
   </CalendarPrimitive.MonthSelect>

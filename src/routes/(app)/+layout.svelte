@@ -21,7 +21,7 @@
 <Sidebar.Provider>
   <AppSidebar />
   <Sidebar.Inset>
-    <div class='flex flex-1 flex-col'>
+    <div class="flex flex-1 flex-col p-2">
       {@render children()}
     </div>
   </Sidebar.Inset>

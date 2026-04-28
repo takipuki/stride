@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
   import { Calendar as CalendarPrimitive } from 'bits-ui';
+  import CaretRightIcon from 'phosphor-svelte/lib/CaretRight';
 
   import { buttonVariants, type ButtonVariant } from '$lib/components/ui/button/index.js';
   import { cn } from '$lib/utils.js';
@@ -17,7 +17,7 @@
 </script>
 
 {#snippet Fallback()}
-  <ChevronRightIcon class="size-4" />
+  <CaretRightIcon class={cn('size-4', className)} />
 {/snippet}
 
 <CalendarPrimitive.NextButton

@@ -65,7 +65,10 @@
             }
           }
 
-          this.editor.chain().insertContent('\n' + leadingSpace).run();
+          this.editor
+            .chain()
+            .insertContent('\n' + leadingSpace)
+            .run();
           return true;
         },
       };
@@ -81,19 +84,11 @@
       editorProps: {
         attributes: {
           spellcheck: 'false',
-          class:
-            'focus:outline-none min-h-full font-mono text-sm leading-relaxed',
+          class: 'focus:outline-none min-h-full font-mono text-sm leading-relaxed',
         },
       },
 
-      extensions: [
-        Document,
-        Paragraph,
-        Text,
-        History,
-        CodeBlockLowlight.configure({ lowlight }),
-        IDEHelper,
-      ],
+      extensions: [Document, Paragraph, Text, History, CodeBlockLowlight.configure({ lowlight }), IDEHelper],
 
       content: `<pre><code class="language-${language}">${initialContent}</code></pre>`,
 

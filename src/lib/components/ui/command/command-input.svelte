@@ -16,12 +16,15 @@
 <div data-slot="command-input-wrapper" class="p-1 pb-0">
   <InputGroup.Root class="h-8! bg-input/20 dark:bg-input/30">
     <CommandPrimitive.Input
+      {value}
       data-slot="command-input"
       class={cn('w-full text-xs/relaxed outline-hidden disabled:cursor-not-allowed disabled:opacity-50', className)}
-      bind:ref
       {...restProps}
-      bind:value
-    />
+    >
+      {#snippet child({ props })}
+        <InputGroup.Input {...props} bind:value bind:ref />
+      {/snippet}
+    </CommandPrimitive.Input>
     <InputGroup.Addon>
       <MagnifyingGlassIcon class="size-3.5 shrink-0 opacity-50" />
     </InputGroup.Addon>

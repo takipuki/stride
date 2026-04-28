@@ -342,7 +342,7 @@
               </div>
             </div>
 
-            <div class="flex flex-grow items-center justify-center p-4">
+            <div class="flex grow items-center justify-center p-4">
               <div class="flex items-center gap-4">
                 <Button
                   variant="outline"
