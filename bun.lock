@@ -7,7 +7,6 @@
       "dependencies": {
         "convex": "^1.36.1",
         "convex-svelte": "^0.0.12",
-        "prismjs": "^1.30.0",
       },
       "devDependencies": {
         "@commitlint/cli": "^20.5.2",
