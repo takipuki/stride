@@ -302,7 +302,7 @@
                                     {:else if isUpcoming}
                                       <Badge
                                         variant="outline"
-                                        class="border-blue-500/25 bg-blue-500/5 text-[9px] font-bold tracking-wider text-blue-500 uppercase"
+                                        class="border-info/25 bg-info/5 text-[9px] font-bold tracking-wider text-info uppercase"
                                       >
                                         Upcoming
                                       </Badge>

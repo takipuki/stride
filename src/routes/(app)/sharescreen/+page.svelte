@@ -161,7 +161,7 @@
           class="grid animate-in grid-cols-2 gap-4 rounded-xl border border-border/30 bg-background/50 p-4 duration-300 fade-in slide-in-from-top-2"
         >
           <div class="flex items-center gap-3">
-            <div class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
+            <div class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-success/10 text-success">
               <ClockIcon class="size-4" />
             </div>
             <div class="flex flex-col">
@@ -174,7 +174,7 @@
 
           <div class="flex items-center gap-3">
             <div
-              class="flex size-8 shrink-0 animate-pulse items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500"
+              class="flex size-8 shrink-0 animate-pulse items-center justify-center rounded-lg bg-success/10 text-success"
             >
               <RadioIcon class="size-4" />
             </div>
@@ -189,7 +189,7 @@
           {#if screenShareState.actualWidth && screenShareState.actualHeight}
             <div class="flex items-center gap-3">
               <div
-                class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500"
+                class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-success/10 text-success"
               >
                 <TvIcon class="size-4" />
               </div>
@@ -205,7 +205,7 @@
           {#if screenShareState.actualFPS}
             <div class="flex items-center gap-3">
               <div
-                class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500"
+                class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-success/10 text-success"
               >
                 <Settings2Icon class="size-4" />
               </div>
@@ -254,7 +254,7 @@
           </p>
         </div>
         <div class="flex gap-3 text-xs text-muted-foreground">
-          <CheckCircleIcon class="size-4 shrink-0 text-emerald-500/70" />
+          <CheckCircleIcon class="size-4 shrink-0 text-success/70" />
           <p>You can navigate to other tabs inside Stride; screen sharing will continue running in the background.</p>
         </div>
       </div>
@@ -269,7 +269,7 @@
         <span class="text-sm font-semibold text-foreground">Screen Preview</span>
         {#if screenShareState.sharing}
           <span
-            class="flex animate-pulse items-center gap-1.5 rounded border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-emerald-400 uppercase"
+            class="flex animate-pulse items-center gap-1.5 rounded border border-success/20 bg-success/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-success uppercase"
           >
             Live
           </span>
@@ -283,7 +283,7 @@
           muted
           autoplay
           playsinline
-          class="aspect-video w-full rounded-lg border border-border/20 bg-black/60 shadow-md transition-all duration-500 {screenShareState.sharing
+          class="aspect-video w-full rounded-lg border border-border/20 bg-pure-black/60 shadow-md transition-all duration-500 {screenShareState.sharing
             ? 'scale-100 opacity-100'
             : 'pointer-events-none absolute scale-95 opacity-0'}"
         ></video>
