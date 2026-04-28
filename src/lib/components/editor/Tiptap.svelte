@@ -112,6 +112,7 @@
   $effect(() => {
     if (editor) {
       editor.setEditable(editable);
+      editor.commands.setCodeBlock({ language });
     }
   });
 
