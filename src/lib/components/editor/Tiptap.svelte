@@ -80,7 +80,7 @@
     isUploadingImage = true;
 
     try {
-      const uploadUrl = await client.mutation(api.posts.generateUploadUrl, {});
+      const uploadUrl = await client.mutation(api.uploadedImages.generateUploadUrl, {});
       const response = await fetch(uploadUrl, {
         method: 'POST',
         headers: {
@@ -95,14 +95,14 @@
       const storageId = result.storageId as string;
 
       if ($session?.userId) {
-        await client.mutation(api.posts.registerUploadedImage, {
+        await client.mutation(api.uploadedImages.registerUploadedImage, {
           storageId: storageId as Id<'_storage'>,
           authorId: $session.userId,
         });
         uploadedStorageIds = [...uploadedStorageIds, storageId];
       }
 
-      const imageUrl = await client.query(api.posts.getImageUrl, { storageId });
+      const imageUrl = await client.query(api.uploadedImages.getImageUrl, { storageId });
 
       if (imageUrl) {
         editor?.chain().focus().setImage({ src: imageUrl }).run();
@@ -186,7 +186,7 @@
     if (uploadedStorageIds.length > 0) {
       // Clean up any uploaded images that were never successfully published (still have postId/commentId as null)
       void client
-        .mutation(api.posts.deleteUploadedImages, {
+        .mutation(api.uploadedImages.deleteUploadedImages, {
           storageIds: uploadedStorageIds as Id<'_storage'>[],
         })
         .catch((err) => {

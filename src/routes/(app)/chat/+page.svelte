@@ -5,6 +5,7 @@
   import Trash from '@lucide/svelte/icons/trash';
   import { useConvexClient, useQuery } from 'convex-svelte';
 
+  import { page } from '$app/state';
   import { api } from '$convex/_generated/api.js';
   import type { Doc, Id } from '$convex/_generated/dataModel';
 
@@ -20,6 +21,13 @@
 
   const client = useConvexClient();
   let selectedChatId = $state<Id<'chats'> | null>(null);
+
+  $effect(() => {
+    const cid = page.url.searchParams.get('chatId');
+    if (cid) {
+      selectedChatId = cid as Id<'chats'>;
+    }
+  });
   let newMessage = $state('');
   let viewportRef = $state<HTMLElement | null>(null);
 
