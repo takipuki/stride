@@ -60,6 +60,7 @@
     "@tiptap/pm": "^3.22.5",
     "@tiptap/starter-kit": "^3.22.5",
     "@types/node": "^22",
+    "@types/simple-peer": "^9.11.9",
     "@vitest/browser-playwright": "^4.1.0",
     "bits-ui": "^2.16.3",
     "blurhash": "^2.0.5",
@@ -73,7 +74,6 @@
     "formsnap": "^2.0.1",
     "globals": "^17.4.0",
     "husky": "^9.1.7",
-    "isomorphic-dompurify": "^3.12.0",
     "knip": "^6.7.0",
     "layerchart": "2.0.0-next.48",
     "lint-staged": "^16.4.0",
@@ -109,6 +109,9 @@
     "vitest-browser-svelte": "^2.0.2"
   },
   "dependencies": {
+    "isomorphic-dompurify": "^3.12.0",
+    "peerjs": "^1.5.5",
+    "simple-peer": "^9.11.1",
     "convex": "^1.39.1",
     "convex-svelte": "^0.0.12"
   },

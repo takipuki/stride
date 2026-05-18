@@ -2,6 +2,13 @@ import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 
 export default defineSchema({
+  signals: defineTable({
+    from: v.string(), // studentId
+    to: v.string(), // "teacher" or studentId
+    type: v.string(), // "offer" | "answer" | "ice"
+    data: v.string(), // JSON stringified
+  }).index('by_to', ['to']),
+
   users: defineTable({
     name: v.string(),
     email: v.string(),
