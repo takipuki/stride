@@ -10,12 +10,11 @@
   import UsersIcon from '@lucide/svelte/icons/users';
   import { useConvexClient, useQuery } from 'convex-svelte';
   import SimplePeer from 'simple-peer/simplepeer.min.js';
+  import { SvelteSet } from 'svelte/reactivity';
 
   import { page } from '$app/state';
   import { api } from '$convex/_generated/api.js';
   import type { Id } from '$convex/_generated/dataModel';
-
-  import { session } from '$lib/session';
 
   const client = useConvexClient();
   const sectionId = page.params.sectionId;
@@ -48,7 +47,7 @@
   let isRefreshing = $state(false);
 
   // Track processed signal IDs to prevent duplicate WebRTC negotiations
-  const processedIds = new Set<string>();
+  const processedIds = new SvelteSet<string>();
 
   // Pagination State
   let currentPage = $state(1);
@@ -170,12 +169,16 @@
       const { peer, stream } = activeStreams[studentId];
       try {
         peer.destroy();
-      } catch (e) {}
+      } catch {
+        /* ignore */
+      }
       if (stream) {
         stream.getTracks().forEach((track) => {
           try {
             track.stop();
-          } catch (e) {}
+          } catch {
+            /* ignore */
+          }
         });
       }
       delete activeStreams[studentId];
@@ -283,7 +286,7 @@
         {@const isLive = connection && connection.status === 'connected' && connection.stream}
 
         <div
-          class="group relative flex flex-col overflow-hidden rounded-2xl border border-border/40 bg-card/45 shadow-xl backdrop-blur-md"
+          class="group relative flex h-fit flex-col overflow-hidden rounded-2xl border border-border/40 bg-card/45 shadow-xl backdrop-blur-md"
         >
           <!-- Card Header details -->
           <div class="flex items-center justify-between border-b border-border/40 bg-background/20 px-4 py-3">
@@ -426,8 +429,8 @@
           </div>
         {/if}
         <div>
-          <h2 class="text-md font-bold text-foreground">{fullscreenStudentObj?.name || 'Student Screen'}</h2>
-          <p class="text-xs text-muted-foreground">Fullscreen Invigilation Mode</p>
+          <h2 class="text-md font-bold text-white">{fullscreenStudentObj?.name || 'Student Screen'}</h2>
+          <p class="text-xs text-zinc-400">Fullscreen Invigilation Mode</p>
         </div>
       </div>
 
@@ -436,7 +439,7 @@
         onclick={() => {
           fullscreenStudentId = null;
         }}
-        class="flex cursor-pointer items-center justify-center rounded-xl border border-border/30 bg-card p-2.5 text-foreground transition-all duration-300 hover:scale-105 hover:bg-secondary"
+        class="flex cursor-pointer items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 p-2.5 text-white transition-all duration-300 hover:scale-105 hover:bg-zinc-800 hover:text-white"
       >
         <Minimize2Icon class="size-4" />
       </button>
@@ -452,8 +455,8 @@
       {:else}
         <div class="flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
           <CircleAlertIcon class="mb-4 size-16 animate-pulse text-amber-500" />
-          <h3 class="text-md font-bold text-foreground">Stream Disconnected</h3>
-          <p class="mt-1 max-w-xs text-xs">The screen stream was interrupted or closed by the student.</p>
+          <h3 class="text-md font-bold text-white">Stream Disconnected</h3>
+          <p class="mt-1 max-w-xs text-xs text-zinc-400">The screen stream was interrupted or closed by the student.</p>
         </div>
       {/if}
     </div>

@@ -7,6 +7,7 @@
   import ScreenShareIcon from '@lucide/svelte/icons/screen-share';
   import { useConvexClient, useQuery } from 'convex-svelte';
   import SimplePeer from 'simple-peer/simplepeer.min.js';
+  import { SvelteSet } from 'svelte/reactivity';
 
   import { page } from '$app/state';
   import { api } from '$convex/_generated/api.js';
@@ -43,7 +44,7 @@
   let videoElement = $state<HTMLVideoElement | null>(null);
 
   // Track processed signal IDs to prevent duplicate WebRTC negotiations
-  const processedIds = new Set<string>();
+  const processedIds = new SvelteSet<string>();
 
   // Re-creates / starts WebRTC peer connection
   function restartPeerConnection() {
@@ -194,13 +195,17 @@
       if (peer) {
         try {
           peer.destroy();
-        } catch (e) {}
+        } catch {
+          /* ignore */
+        }
       }
       if (stream) {
         stream.getTracks().forEach((t) => {
           try {
             t.stop();
-          } catch (e) {}
+          } catch {
+            /* ignore */
+          }
         });
       }
     };
