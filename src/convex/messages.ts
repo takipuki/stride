@@ -16,6 +16,33 @@ export const listByChat = query({
   },
 });
 
+export const listWithSender = query({
+  args: {
+    chatId: v.id('chats'),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const q = ctx.db
+      .query('messages')
+      .withIndex('by_chat', (q) => q.eq('chatId', args.chatId))
+      .order('asc');
+    const messages = args.limit ? await q.take(args.limit) : await q.collect();
+
+    return Promise.all(
+      messages.map(async (msg) => {
+        const sender = await ctx.db.get(msg.senderId);
+        return {
+          ...msg,
+          senderName: sender?.name ?? 'Unknown',
+          senderAvatar:
+            sender?.avatarUrl ??
+            `https://api.dicebear.com/9.x/thumbs/svg?seed=${sender?.email ?? sender?.name ?? 'unknown'}`,
+        };
+      }),
+    );
+  },
+});
+
 export const send = mutation({
   args: {
     chatId: v.id('chats'),
