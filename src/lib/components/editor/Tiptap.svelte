@@ -1,30 +1,38 @@
 <script lang="ts">
+  import Bold from '@lucide/svelte/icons/bold';
+  import Code from '@lucide/svelte/icons/code';
+  import Heading1 from '@lucide/svelte/icons/heading-1';
+  import Heading2 from '@lucide/svelte/icons/heading-2';
+  import ImageIcon from '@lucide/svelte/icons/image';
+  import Italic from '@lucide/svelte/icons/italic';
+  import LinkIcon from '@lucide/svelte/icons/link';
+  import List from '@lucide/svelte/icons/list';
+  import ListOrdered from '@lucide/svelte/icons/list-ordered';
+  import Loader2 from '@lucide/svelte/icons/loader-2';
+  import Quote from '@lucide/svelte/icons/quote';
+  import Redo from '@lucide/svelte/icons/redo';
+  import SquareCode from '@lucide/svelte/icons/square-code';
+  import Strikethrough from '@lucide/svelte/icons/strikethrough';
+  import Undo from '@lucide/svelte/icons/undo';
+  import UploadCloud from '@lucide/svelte/icons/upload-cloud';
   import { Editor } from '@tiptap/core';
   import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
   import Image from '@tiptap/extension-image';
   import Link from '@tiptap/extension-link';
   import StarterKit from '@tiptap/starter-kit';
+  import { useConvexClient } from 'convex-svelte';
   import { common, createLowlight } from 'lowlight';
-  import {
-    Bold,
-    Code,
-    Heading1,
-    Heading2,
-    ImageIcon,
-    Italic,
-    Link as LinkIcon,
-    List,
-    ListOrdered,
-    Quote,
-    Redo,
-    SquareCode,
-    Strikethrough,
-    Undo,
-  } from 'lucide-svelte';
   import { onDestroy, onMount } from 'svelte';
+  import { toast } from 'svelte-sonner';
+
+  import { api } from '$convex/_generated/api.js';
+  import type { Id } from '$convex/_generated/dataModel.js';
 
   import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input/index.js';
+  import * as Popover from '$lib/components/ui/popover/index.js';
   import { Separator } from '$lib/components/ui/separator';
+  import { session } from '$lib/session';
 
   let { initialContent = '', onUpdate } = $props();
 
@@ -34,7 +42,7 @@
 
   const lowlight = createLowlight(common);
 
-  function checkActive(type: string, options?: any) {
+  function checkActive(type: string, options?: Record<string, unknown>) {
     void tick;
     return editor?.isActive(type, options);
   }
@@ -49,9 +57,66 @@
     return editor?.can().redo();
   }
 
-  function addImage() {
-    const url = window.prompt('Enter Image URL');
-    if (url) editor?.chain().focus().setImage({ src: url }).run();
+  const client = useConvexClient();
+
+  let isImagePopoverOpen = $state(false);
+  let imageTab = $state<'upload' | 'url'>('upload');
+  let isUploadingImage = $state(false);
+  let imageUrlInput = $state('');
+  let uploadedStorageIds = $state<string[]>([]);
+
+  function insertImageUrl() {
+    if (imageUrlInput.trim()) {
+      editor?.chain().focus().setImage({ src: imageUrlInput.trim() }).run();
+      imageUrlInput = '';
+      isImagePopoverOpen = false;
+    }
+  }
+
+  async function handleImageUpload(e: Event) {
+    const target = e.target as HTMLInputElement;
+    if (!target.files || target.files.length === 0) return;
+    const file = target.files[0];
+    isUploadingImage = true;
+
+    try {
+      const uploadUrl = await client.mutation(api.posts.generateUploadUrl, {});
+      const response = await fetch(uploadUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': file.type,
+        },
+        body: file,
+      });
+
+      if (!response.ok) throw new Error('HTTP upload failed');
+
+      const result = await response.json();
+      const storageId = result.storageId as string;
+
+      if ($session?.userId) {
+        await client.mutation(api.posts.registerUploadedImage, {
+          storageId: storageId as Id<'_storage'>,
+          authorId: $session.userId,
+        });
+        uploadedStorageIds = [...uploadedStorageIds, storageId];
+      }
+
+      const imageUrl = await client.query(api.posts.getImageUrl, { storageId });
+
+      if (imageUrl) {
+        editor?.chain().focus().setImage({ src: imageUrl }).run();
+        toast.success('Image uploaded successfully.');
+      } else {
+        toast.error('Failed to resolve image URL.');
+      }
+      isImagePopoverOpen = false;
+    } catch (err) {
+      console.error('Failed to upload image:', err);
+      toast.error('Failed to upload image. Please try again.');
+    } finally {
+      isUploadingImage = false;
+    }
   }
 
   function setLink() {
@@ -118,6 +183,16 @@
 
   onDestroy(() => {
     editor?.destroy();
+    if (uploadedStorageIds.length > 0) {
+      // Clean up any uploaded images that were never successfully published (still have postId/commentId as null)
+      void client
+        .mutation(api.posts.deleteUploadedImages, {
+          storageIds: uploadedStorageIds as Id<'_storage'>[],
+        })
+        .catch((err) => {
+          console.error('Failed to clean up pending uploads on destroy:', err);
+        });
+    }
   });
 
   const btnClass = 'h-8 w-8 p-0';
@@ -204,9 +279,74 @@
       >
         <Quote size={16} />
       </Button>
-      <Button variant="ghost" size="icon" class={btnClass} onclick={addImage}>
-        <ImageIcon size={16} />
-      </Button>
+      <Popover.Root bind:open={isImagePopoverOpen}>
+        <Popover.Trigger>
+          <Button variant="ghost" size="icon" class={btnClass}>
+            <ImageIcon size={16} />
+          </Button>
+        </Popover.Trigger>
+        <Popover.Content class="flex w-80 flex-col gap-3 p-4">
+          <Popover.Header class="p-0">
+            <Popover.Title class="text-sm font-bold text-foreground">Insert Image</Popover.Title>
+          </Popover.Header>
+
+          <div class="grid grid-cols-2 gap-1 rounded-lg bg-muted p-0.5 text-xs">
+            <button
+              type="button"
+              onclick={() => (imageTab = 'upload')}
+              class={`rounded px-2 py-1 font-medium transition-all ${imageTab === 'upload' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              Upload
+            </button>
+            <button
+              type="button"
+              onclick={() => (imageTab = 'url')}
+              class={`rounded px-2 py-1 font-medium transition-all ${imageTab === 'url' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              Paste URL
+            </button>
+          </div>
+
+          {#if imageTab === 'upload'}
+            <div class="flex flex-col gap-2">
+              {#if isUploadingImage}
+                <div
+                  class="flex h-24 flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/5 text-xs text-muted-foreground"
+                >
+                  <Loader2 class="h-5 w-5 animate-spin text-primary" />
+                  <span>Uploading to Convex...</span>
+                </div>
+              {:else}
+                <button
+                  type="button"
+                  onclick={() => document.getElementById('tiptap-image-file')?.click()}
+                  class="flex h-24 flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-primary/20 text-center text-xs text-muted-foreground transition-all hover:border-primary/50 hover:bg-muted/10"
+                >
+                  <UploadCloud class="h-6 w-6 text-primary/60" />
+                  <span>Click to browse or upload</span>
+                  <input
+                    id="tiptap-image-file"
+                    type="file"
+                    accept="image/*"
+                    class="hidden"
+                    onchange={handleImageUpload}
+                  />
+                </button>
+              {/if}
+            </div>
+          {:else}
+            <div class="flex flex-col gap-2">
+              <Input
+                type="text"
+                placeholder="https://example.com/image.png"
+                bind:value={imageUrlInput}
+                class="h-8 border-border bg-muted/10 text-xs"
+              />
+              <Button size="sm" onclick={insertImageUrl} class="h-8 text-xs font-semibold">Insert Image</Button>
+            </div>
+          {/if}
+        </Popover.Content>
+      </Popover.Root>
       <Button variant={checkActive('link') ? 'secondary' : 'ghost'} size="icon" class={btnClass} onclick={setLink}>
         <LinkIcon size={16} />
       </Button>

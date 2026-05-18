@@ -1,5 +1,4 @@
 <script lang="ts">
-  import EllipsisIcon from '@lucide/svelte/icons/ellipsis';
   import PlusIcon from '@lucide/svelte/icons/plus';
   import SearchIcon from '@lucide/svelte/icons/search';
   import Trash2Icon from '@lucide/svelte/icons/trash-2';
@@ -8,13 +7,13 @@
   import { toast } from 'svelte-sonner';
 
   import { api } from '$convex/_generated/api.js';
+  import type { Doc } from '$convex/_generated/dataModel.js';
 
   import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
   import * as Avatar from '$lib/components/ui/avatar/index.js';
   import { Badge } from '$lib/components/ui/badge/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
   import * as Dialog from '$lib/components/ui/dialog/index.js';
-  import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
   import { Input } from '$lib/components/ui/input/index.js';
   import { Label } from '$lib/components/ui/label/index.js';
   import * as Select from '$lib/components/ui/select/index.js';
@@ -37,11 +36,11 @@
   );
 
   // Edit User State
-  let editingUser = $state<any>(null);
+  let editingUser = $state<Doc<'users'> | null>(null);
   let editDialogOpen = $state(false);
   let isSaving = $state(false);
 
-  function openEditDialog(user: any) {
+  function openEditDialog(user: Doc<'users'>) {
     editingUser = { ...user };
     editDialogOpen = true;
   }
@@ -69,11 +68,12 @@
   }
 
   // Delete User State
-  let deletingUser = $state<any>(null);
+  let deletingUser = $state<Doc<'users'> | null>(null);
   let deleteDialogOpen = $state(false);
   let isDeleting = $state(false);
 
-  function confirmDelete(user: any) {
+  function confirmDelete(user: Doc<'users'> | null) {
+    if (!user) return;
     deletingUser = user;
     deleteDialogOpen = true;
   }
@@ -94,7 +94,14 @@
   }
 
   // Create User State
-  let newUser = $state({
+  let newUser = $state<{
+    name: string;
+    email: string;
+    password: string;
+    role: 'student' | 'teacher' | 'admin';
+    aboutMd: string;
+    avatarUrl: string;
+  }>({
     name: '',
     email: '',
     password: '',
@@ -128,7 +135,7 @@
         name: newUser.name,
         email: newUser.email,
         passwordHash: newUser.password,
-        role: newUser.role as any,
+        role: newUser.role,
         aboutMd: newUser.aboutMd || undefined,
         avatarUrl: newUser.avatarUrl || undefined,
       });
@@ -190,7 +197,7 @@
       </Table.Header>
       <Table.Body>
         {#if usersQuery.isLoading}
-          {#each Array(5) as _, i (i)}
+          {#each [0, 1, 2, 3, 4] as i (i)}
             <Table.Row>
               <Table.Cell><Skeleton class="h-10 w-10 rounded-full" /></Table.Cell>
               <Table.Cell><Skeleton class="h-4 w-[150px]" /></Table.Cell>
@@ -257,10 +264,10 @@
           <div class="col-span-3">
             <Select.Root type="single" bind:value={editingUser.role}>
               <Select.Trigger class="col-span-3">
-                {roles.find((r) => r.value === editingUser.role)?.label ?? 'Select role'}
+                {roles.find((r) => r.value === editingUser?.role)?.label ?? 'Select role'}
               </Select.Trigger>
               <Select.Content>
-                {#each roles as role}
+                {#each roles as role (role.value)}
                   <Select.Item value={role.value} label={role.label}>{role.label}</Select.Item>
                 {/each}
               </Select.Content>
@@ -368,7 +375,7 @@
               {roles.find((r) => r.value === newUser.role)?.label ?? 'Select role'}
             </Select.Trigger>
             <Select.Content>
-              {#each roles as role}
+              {#each roles as role (role.value)}
                 <Select.Item value={role.value} label={role.label}>{role.label}</Select.Item>
               {/each}
             </Select.Content>

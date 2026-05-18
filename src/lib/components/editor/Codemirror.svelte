@@ -1,6 +1,6 @@
 <script lang="ts">
   import { acceptCompletion } from '@codemirror/autocomplete';
-  import { indentLess, indentMore, indentWithTab, insertTab } from '@codemirror/commands';
+  import { indentLess, indentMore, insertTab } from '@codemirror/commands';
   import { cpp } from '@codemirror/lang-cpp';
   import { java } from '@codemirror/lang-java';
   import { javascript } from '@codemirror/lang-javascript';
