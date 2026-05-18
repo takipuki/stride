@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { Send } from '@lucide/svelte';
   import MoreVertical from '@lucide/svelte/icons/more-vertical';
   import Pencil from '@lucide/svelte/icons/pencil';
+  import Send from '@lucide/svelte/icons/send';
   import Trash from '@lucide/svelte/icons/trash';
   import { useConvexClient, useQuery } from 'convex-svelte';
 

@@ -5,6 +5,7 @@
   import { page } from '$app/state';
   import { PUBLIC_CONVEX_URL } from '$env/static/public';
 
+  import { Toaster } from '$lib/components/ui/sonner/index.js';
   import { locales, localizeHref } from '$lib/paraglide/runtime';
 
   import './layout.css';
@@ -21,6 +22,7 @@
 </svelte:head>
 
 <ModeWatcher />
+<Toaster />
 
 {@render children()}
 

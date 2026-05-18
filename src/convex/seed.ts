@@ -21,6 +21,8 @@ const TABLES = [
   'tags',
   'postTags',
   'comments',
+  'postVotes',
+  'commentVotes',
 ] as const;
 
 const DEFAULT_PASS = 'pass';
@@ -321,7 +323,9 @@ export default internalMutation({
 
     const post1 = await ctx.db.insert('posts', {
       authorId: rhasan,
+      title: 'Recursion limits in Python',
       contentMd: 'Is it okay to use recursion for the factorial problem? Will it hit stack limits?',
+      score: 1,
       createdAt: NOW - 2 * ONE_HOUR,
       updatedAt: NOW - 2 * ONE_HOUR,
     });
