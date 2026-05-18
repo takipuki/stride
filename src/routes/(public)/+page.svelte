@@ -47,7 +47,7 @@
   <!-- Minimalist Background Pattern -->
   <div class="pointer-events-none absolute inset-0 overflow-hidden">
     <div
-      class="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_100%)] bg-[size:64px_64px]"
+      class="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] mask-[radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_100%)] bg-size-[64px_64px]"
     ></div>
   </div>
 
@@ -63,7 +63,7 @@
         </Badge>
 
         <h1
-          class="bg-gradient-to-b from-foreground to-foreground/60 bg-clip-text text-5xl font-extrabold tracking-tight text-balance text-transparent sm:text-6xl md:text-7xl lg:text-8xl"
+          class="bg-linear-to-b from-foreground to-foreground/60 bg-clip-text text-5xl font-extrabold tracking-tight text-balance text-transparent sm:text-6xl md:text-7xl lg:text-8xl"
         >
           Empower Academic Excellence with <span class="text-primary">Real-Time</span> Assessment
         </h1>
@@ -99,7 +99,7 @@
           class="relative rounded-2xl border border-border/50 bg-card/50 p-2 shadow-[0_0_50px_-12px_rgba(0,0,0,0.12)] backdrop-blur-md dark:shadow-2xl dark:shadow-primary/5"
         >
           <div
-            class="flex aspect-[16/9] w-full items-center justify-center rounded-xl border border-dashed border-border/50 bg-muted/30"
+            class="flex aspect-video w-full items-center justify-center rounded-xl border border-dashed border-border/50 bg-muted/30"
           >
             <div class="flex flex-col items-center gap-4 text-muted-foreground/60">
               <MonitorIcon size={64} strokeWidth={1} />
@@ -117,7 +117,7 @@
           {#each stats as stat (stat.label)}
             <div class="flex flex-col items-center text-center">
               <span
-                class="bg-gradient-to-b from-primary to-primary/70 bg-clip-text text-4xl font-bold tracking-tighter text-transparent md:text-5xl"
+                class="bg-linear-to-b from-primary to-primary/70 bg-clip-text text-4xl font-bold tracking-tighter text-transparent md:text-5xl"
               >
                 {stat.value}
               </span>
@@ -206,8 +206,18 @@
       </p>
 
       <div class="flex gap-8">
-        <a href="#" class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Terms</a>
-        <a href="#" class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Privacy</a>
+        <a href="/disclaimer" class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+          >Terms</a
+        >
+        <a href="/disclaimer" class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+          >Privacy</a
+        >
+        <a
+          href="https://github.com/hamedzurat/stride/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">GitHub</a
+        >
       </div>
     </div>
   </footer>
