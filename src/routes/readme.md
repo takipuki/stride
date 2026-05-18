@@ -14,8 +14,8 @@ This document outlines the URL structure for the application and what each page 
 ### General & Profile
 
 - [x] `/(app)/dashboard/+page.svelte` — Unified dashboard overview (upcoming exams for students, active tasks for teachers).
-- [ ] `/(app)/users/[userId]/+page.svelte` — Public read-only profile view (avatar, about).
-- [ ] `/(app)/settings/+page.svelte` — Personal account settings (profile details, password, avatar).
+- [x] `/(app)/users/[userId]/+page.svelte` — Public read-only profile view (avatar, about).
+- [x] `/(app)/settings/+page.svelte` — Personal account settings (profile details, password, avatar).
 
 ### Administration
 
@@ -28,6 +28,8 @@ This document outlines the URL structure for the application and what each page 
 - [ ] `/(app)/sections/new/+page.svelte` — Admins create new sections.
 - [ ] `/(app)/sections/[sectionId]/+page.svelte` — Section hub listing its activities and members.
 - [ ] `/(app)/sections/[sectionId]/edit/+page.svelte` — Manage section details and user enrollments.
+- [x] `/(app)/sections/[sectionId]/cctv/+page.svelte` — Class CCTV grid view (real-time student screen sharing monitoring).
+- [x] `/(app)/sections/[sectionId]/sharescreen/+page.svelte` — Screen sharing client for students during live sessions.
 
 ### Activities (Exams & Live Classes)
 
@@ -35,7 +37,6 @@ This document outlines the URL structure for the application and what each page 
 - [x] `/(app)/activities/[activityId]/[problemId]/+page.svelte` — The live room (Exam interface or class viewer).
 - [ ] `/(app)/activities/[activityId]/edit/+page.svelte` — Update activity settings, attach and reorder problems.
 - [ ] `/(app)/activities/[activityId]/results/+page.svelte` — Scoreboard showing all student submissions and grades.
-- [ ] `/(app)/activities/[activityId]/cctv/+page.svelte` — Live grid view of all student screenshares.
 - [x] `/(app)/activities/[activityId]/playback/+page.svelte` — Dashboard for reviewing student code progression.
 - [x] `/(app)/activities/[activityId]/playback/[problemId]/[studentId]/+page.svelte` — Playback of a student's code snapshots for a specific problem.
 
