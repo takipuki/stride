@@ -7,6 +7,7 @@
   import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
   import PencilIcon from '@lucide/svelte/icons/pencil';
   import PlayCircleIcon from '@lucide/svelte/icons/play-circle';
+  import ScreenShareIcon from '@lucide/svelte/icons/screen-share';
   import { useQuery } from 'convex-svelte';
 
   import { goto } from '$app/navigation';
@@ -82,6 +83,33 @@
                 </Collapsible.Trigger>
                 <Collapsible.Content>
                   <Sidebar.MenuSub>
+                    {#if session.role === 'student'}
+                      <Sidebar.MenuSubItem>
+                        <Sidebar.MenuSubButton>
+                          {#snippet child({ props })}
+                            <a href="/sections/{section._id}/sharescreen" {...props}>
+                              <ScreenShareIcon class="size-3.5 shrink-0 text-sidebar-foreground/60" />
+                              <span class="truncate text-xs font-semibold text-sidebar-foreground/60">Share Screen</span
+                              >
+                            </a>
+                          {/snippet}
+                        </Sidebar.MenuSubButton>
+                      </Sidebar.MenuSubItem>
+                    {/if}
+
+                    {#if session.role === 'teacher'}
+                      <Sidebar.MenuSubItem>
+                        <Sidebar.MenuSubButton>
+                          {#snippet child({ props })}
+                            <a href="/sections/{section._id}/cctv" {...props}>
+                              <CctvIcon class="size-3.5 shrink-0 text-sidebar-foreground/60" />
+                              <span class="truncate text-xs font-semibold text-sidebar-foreground/60">CCTV Hub</span>
+                            </a>
+                          {/snippet}
+                        </Sidebar.MenuSubButton>
+                      </Sidebar.MenuSubItem>
+                    {/if}
+
                     {#if activeActivities.length === 0}
                       <Sidebar.MenuSubItem>
                         <Sidebar.MenuSubButton>
@@ -89,6 +117,12 @@
                         </Sidebar.MenuSubButton>
                       </Sidebar.MenuSubItem>
                     {:else}
+                      <div
+                        class="mt-2 border-t border-border/20 px-2 py-1 pt-2 text-[10px] font-bold tracking-wider text-sidebar-foreground/40 uppercase"
+                      >
+                        Active Activities
+                      </div>
+
                       {#each activeActivities as activity (activity._id)}
                         {@const problemsQuery = useQuery(api.activities.listProblems, () =>
                           session.role === 'student' ? { activityId: activity._id } : 'skip',
@@ -117,16 +151,6 @@
                         {/if}
 
                         {#if session.role === 'teacher'}
-                          <Sidebar.MenuSubItem>
-                            <Sidebar.MenuSubButton>
-                              {#snippet child({ props })}
-                                <a href="/activities/{activity._id}/cctv" {...props}>
-                                  <CctvIcon class="size-3 shrink-0 text-sidebar-foreground/60" />
-                                  <span class="truncate text-xs text-sidebar-foreground/60"> CCTV </span>
-                                </a>
-                              {/snippet}
-                            </Sidebar.MenuSubButton>
-                          </Sidebar.MenuSubItem>
                           <Sidebar.MenuSubItem>
                             <Sidebar.MenuSubButton>
                               {#snippet child({ props })}
