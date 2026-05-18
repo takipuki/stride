@@ -7,8 +7,8 @@
   const studentId = crypto.randomUUID();
 
   const client = useConvexClient();
-  const sendSignal = (data) => client.mutation(api.signals.send, data);
-  const removeSignal = (data) => client.mutation(api.signals.remove, data);
+  const sendSignal = (data: any) => client.mutation(api.signals.send, data);
+  const removeSignal = (data: any) => client.mutation(api.signals.remove, data);
   const incomingSignals = useQuery(api.signals.getFor, { to: studentId });
   $effect(() => {
     console.log(incomingSignals);
@@ -26,7 +26,7 @@
 
     const p = new SimplePeer({ initiator: true, stream, trickle: false });
 
-    p.on('signal', (data) => {
+    p.on('signal', (data: any) => {
       const type = data.type === 'offer' ? 'offer' : 'ice';
       sendSignal({ from: studentId, to: 'teacher', type, data: JSON.stringify(data) });
     });
