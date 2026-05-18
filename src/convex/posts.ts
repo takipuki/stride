@@ -3,13 +3,6 @@ import { v } from 'convex/values';
 import type { Doc, Id } from './_generated/dataModel';
 import { internalMutation, mutation, query, type MutationCtx } from './_generated/server';
 
-export const generateUploadUrl = mutation({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.storage.generateUploadUrl();
-  },
-});
-
 export const get = query({
   args: {
     id: v.id('posts'),
@@ -383,28 +376,6 @@ export const removeTag = mutation({
   },
 });
 
-export const getImageUrl = query({
-  args: { storageId: v.string() },
-  handler: async (ctx, args) => {
-    return await ctx.storage.getUrl(args.storageId);
-  },
-});
-
-export const registerUploadedImage = mutation({
-  args: {
-    storageId: v.id('_storage'),
-    authorId: v.id('users'),
-  },
-  handler: async (ctx, args) => {
-    const now = Date.now();
-    await ctx.db.insert('uploadedImages', {
-      storageId: args.storageId,
-      authorId: args.authorId,
-      createdAt: now,
-    });
-  },
-});
-
 // --- Helper Functions for Rich Text Editor Image Tracking ---
 
 async function associateImagesForPost(
@@ -498,54 +469,3 @@ async function deleteImagesForPost(ctx: MutationCtx, postId: Id<'posts'>) {
     await ctx.db.delete(img._id);
   }
 }
-
-export const listUploadedImages = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query('uploadedImages').collect();
-  },
-});
-
-export const cleanupOldPendingImages = internalMutation({
-  args: {},
-  handler: async (ctx) => {
-    // Clean up images that are older than 2 hours and still in "pending" status (no postId and no commentId)
-    const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
-    const allPending = await ctx.db.query('uploadedImages').collect();
-    const oldPending = allPending.filter((img) => !img.postId && !img.commentId && img.createdAt < twoHoursAgo);
-
-    console.log(`[CRON] Found ${oldPending.length} old pending images to clean up.`);
-
-    for (const img of oldPending) {
-      try {
-        await ctx.storage.delete(img.storageId);
-        console.log(`[CRON] Deleted storage file ${img.storageId}`);
-      } catch (e) {
-        console.error(`[CRON] Failed to delete storage file ${img.storageId}:`, e);
-      }
-      await ctx.db.delete(img._id);
-    }
-  },
-});
-
-export const deleteUploadedImages = mutation({
-  args: {
-    storageIds: v.array(v.id('_storage')),
-  },
-  handler: async (ctx, args) => {
-    for (const storageId of args.storageIds) {
-      const img = await ctx.db
-        .query('uploadedImages')
-        .withIndex('by_storage', (q) => q.eq('storageId', storageId))
-        .first();
-      if (img && !img.postId && !img.commentId) {
-        try {
-          await ctx.storage.delete(storageId);
-        } catch (e) {
-          console.error('Failed to delete image from storage on cancel:', e);
-        }
-        await ctx.db.delete(img._id);
-      }
-    }
-  },
-});

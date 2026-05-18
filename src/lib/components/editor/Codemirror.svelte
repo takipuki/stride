@@ -8,9 +8,9 @@
   import { Compartment, EditorState } from '@codemirror/state';
   import { oneDark } from '@codemirror/theme-one-dark';
   import { EditorView, keymap } from '@codemirror/view';
+  import Moon from '@lucide/svelte/icons/moon';
+  import Sun from '@lucide/svelte/icons/sun';
   import { basicSetup } from 'codemirror';
-  import Moon from 'lucide-svelte/icons/moon';
-  import Sun from 'lucide-svelte/icons/sun';
   import { onDestroy, onMount } from 'svelte';
 
   import { Button } from '$lib/components/ui/button';

@@ -1,5 +1,6 @@
 import { v } from 'convex/values';
 
+import type { Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 
 export const get = query({
@@ -91,5 +92,62 @@ export const remove = mutation({
   args: { id: v.id('chats') },
   handler: async (ctx, args) => {
     await ctx.db.delete(args.id);
+  },
+});
+
+export const getOrCreateDirectChat = mutation({
+  args: {
+    userA: v.id('users'),
+    userB: v.id('users'),
+  },
+  handler: async (ctx, args) => {
+    if (args.userA === args.userB) {
+      throw new Error('Cannot start a chat with yourself.');
+    }
+
+    // Fetch memberships of User A
+    const membershipsA = await ctx.db
+      .query('chatMembers')
+      .withIndex('by_user', (q) => q.eq('userId', args.userA))
+      .collect();
+
+    // Fetch memberships of User B
+    const membershipsB = await ctx.db
+      .query('chatMembers')
+      .withIndex('by_user', (q) => q.eq('userId', args.userB))
+      .collect();
+
+    // Find if any chatId is in both sets
+    const chatIdsA = new Set(membershipsA.map((m) => m.chatId));
+    let commonChatId: Id<'chats'> | null = null;
+
+    for (const mB of membershipsB) {
+      if (chatIdsA.has(mB.chatId)) {
+        // Check if this chat has exactly 2 members (direct message)
+        const members = await ctx.db
+          .query('chatMembers')
+          .withIndex('by_chat', (q) => q.eq('chatId', mB.chatId))
+          .collect();
+        if (members.length === 2) {
+          commonChatId = mB.chatId;
+          break;
+        }
+      }
+    }
+
+    if (commonChatId) {
+      return commonChatId;
+    }
+
+    // Create new chat if not found
+    const userADoc = await ctx.db.get(args.userA);
+    const userBDoc = await ctx.db.get(args.userB);
+    const chatName = `${userADoc?.name || 'User'} & ${userBDoc?.name || 'User'}`;
+
+    const chatId = await ctx.db.insert('chats', { name: chatName, createdAt: Date.now() });
+    await ctx.db.insert('chatMembers', { chatId, userId: args.userA, joinedAt: Date.now() });
+    await ctx.db.insert('chatMembers', { chatId, userId: args.userB, joinedAt: Date.now() });
+
+    return chatId;
   },
 });
