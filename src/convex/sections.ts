@@ -16,6 +16,34 @@ export const list = query({
   },
 });
 
+export const listWithMembers = query({
+  args: {},
+  handler: async (ctx) => {
+    const sections = await ctx.db.query('sections').collect();
+    return Promise.all(
+      sections.map(async (section) => {
+        const teachersRows = await ctx.db
+          .query('sectionTeachers')
+          .withIndex('by_section', (q) => q.eq('sectionId', section._id))
+          .collect();
+        const teachers = await Promise.all(teachersRows.map((r) => ctx.db.get(r.teacherId)));
+
+        const studentsRows = await ctx.db
+          .query('sectionStudents')
+          .withIndex('by_section', (q) => q.eq('sectionId', section._id))
+          .collect();
+        const students = await Promise.all(studentsRows.map((r) => ctx.db.get(r.studentId)));
+
+        return {
+          ...section,
+          teachers: teachers.filter(Boolean),
+          students: students.filter(Boolean),
+        };
+      }),
+    );
+  },
+});
+
 export const create = mutation({
   args: {
     name: v.string(),

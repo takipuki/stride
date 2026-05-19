@@ -159,7 +159,7 @@
       </button>
       <button
         class="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors {filterTab === 'active'
-          ? 'bg-emerald-600 text-white'
+          ? 'bg-success text-success-foreground'
           : 'text-muted-foreground hover:bg-muted'}"
         onclick={() => (filterTab = 'active')}
       >
@@ -167,7 +167,7 @@
       </button>
       <button
         class="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors {filterTab === 'upcoming'
-          ? 'bg-blue-600 text-white'
+          ? 'bg-info text-info-foreground'
           : 'text-muted-foreground hover:bg-muted'}"
         onclick={() => (filterTab = 'upcoming')}
       >
@@ -175,7 +175,7 @@
       </button>
       <button
         class="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors {filterTab === 'past'
-          ? 'bg-zinc-600 text-white'
+          ? 'bg-secondary text-secondary-foreground'
           : 'text-muted-foreground hover:bg-muted'}"
         onclick={() => (filterTab = 'past')}
       >
@@ -211,9 +211,7 @@
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
                 {#if status === 'active'}
-                  <span
-                    class="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400"
-                  >
+                  <span class="rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-bold text-success">
                     Active
                   </span>
                 {:else}
