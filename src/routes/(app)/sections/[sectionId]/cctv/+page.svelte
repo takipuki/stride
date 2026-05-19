@@ -401,7 +401,7 @@
                 </span>
               {:else}
                 <span
-                  class="flex animate-pulse items-center gap-1 rounded border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold tracking-wider text-emerald-400 uppercase"
+                  class="flex animate-pulse items-center gap-1 rounded border border-success/20 bg-success/10 px-2 py-0.5 text-[9px] font-bold tracking-wider text-success uppercase"
                 >
                   Live
                 </span>

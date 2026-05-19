@@ -60,7 +60,7 @@
   let isSubmittingReply = $state(false);
 
   // Set of collapsed comment IDs
-  let collapsedCommentIds = $state<Set<Id<'comments'>>>(new SvelteSet());
+  let collapsedCommentIds = new SvelteSet<Id<'comments'>>();
 
   let commentToDeleteId = $state<Id<'comments'> | null>(null);
   let deleteCommentDialogOpen = $state(false);
