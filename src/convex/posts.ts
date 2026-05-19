@@ -58,7 +58,7 @@ export const list = query({
     onlyMyPosts: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    let posts: Doc<'posts'>[] = [];
+    let posts;
     if (args.tagIds && args.tagIds.length > 0) {
       const allPostIds = new Set<string>();
       for (const tId of args.tagIds) {

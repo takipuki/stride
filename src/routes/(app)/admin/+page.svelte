@@ -5,12 +5,12 @@
   import Lock from '@lucide/svelte/icons/lock';
   import Search from '@lucide/svelte/icons/search';
   import { useQuery } from 'convex-svelte';
+  import { SvelteSet } from 'svelte/reactivity';
   import { fade } from 'svelte/transition';
 
   import { api } from '$convex/_generated/api.js';
 
   import { Badge } from '$lib/components/ui/badge/index.js';
-  import { Button } from '$lib/components/ui/button/index.js';
   import * as Card from '$lib/components/ui/card/index.js';
   import { Input } from '$lib/components/ui/input/index.js';
   import * as Select from '$lib/components/ui/select/index.js';
@@ -56,7 +56,7 @@
   const allColumns = $derived.by(() => {
     const data = tableDataQuery.data || [];
     if (data.length === 0) return [];
-    const keysSet = new Set<string>();
+    const keysSet = new SvelteSet<string>();
     for (const row of data) {
       for (const key of Object.keys(row)) {
         if (!isFilteredKey(key)) {
@@ -91,7 +91,7 @@
       if (valA === undefined || valA === null) return 1;
       if (valB === undefined || valB === null) return -1;
 
-      let comparison = 0;
+      let comparison;
       if (typeof valA === 'number' && typeof valB === 'number') {
         comparison = valA - valB;
       } else {
@@ -128,7 +128,7 @@
             timeStyle: 'short',
           });
         }
-      } catch (e) {
+      } catch (_) {
         // fallback
       }
     }

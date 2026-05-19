@@ -1,7 +1,6 @@
 <script lang="ts">
   import ArrowDown from '@lucide/svelte/icons/arrow-down';
   import ArrowUp from '@lucide/svelte/icons/arrow-up';
-  import Award from '@lucide/svelte/icons/award';
   import Calendar from '@lucide/svelte/icons/calendar';
   import Clock from '@lucide/svelte/icons/clock';
   import Flame from '@lucide/svelte/icons/flame';
