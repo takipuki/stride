@@ -186,6 +186,7 @@ export default defineSchema({
     commentId: v.optional(v.id('comments')),
     aboutUserId: v.optional(v.id('users')),
     sectionId: v.optional(v.id('sections')),
+    problemId: v.optional(v.id('problems')),
     isAvatar: v.optional(v.boolean()),
     createdAt: v.number(),
   })
@@ -193,6 +194,7 @@ export default defineSchema({
     .index('by_comment', ['commentId'])
     .index('by_aboutUserId', ['aboutUserId'])
     .index('by_section', ['sectionId'])
+    .index('by_problem', ['problemId'])
     .index('by_storage', ['storageId'])
     .index('by_author', ['authorId']),
 });

@@ -44,7 +44,15 @@ export const deleteUploadedImages = mutation({
         .query('uploadedImages')
         .withIndex('by_storage', (q) => q.eq('storageId', storageId))
         .first();
-      if (img && !img.postId && !img.commentId && !img.aboutUserId && !img.sectionId && !img.isAvatar) {
+      if (
+        img &&
+        !img.postId &&
+        !img.commentId &&
+        !img.aboutUserId &&
+        !img.sectionId &&
+        !img.problemId &&
+        !img.isAvatar
+      ) {
         try {
           await ctx.storage.delete(storageId);
         } catch (e) {
@@ -59,7 +67,7 @@ export const deleteUploadedImages = mutation({
 export const cleanupOldPendingImages = internalMutation({
   args: {},
   handler: async (ctx) => {
-    // Clean up images that are older than 24 hours and still in "pending" status (no postId, no commentId, no aboutUserId, no sectionId, and no isAvatar)
+    // Clean up images that are older than 24 hours and still in "pending" status (no postId, no commentId, no aboutUserId, no sectionId, no problemId, and no isAvatar)
     const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000;
     const allPending = await ctx.db.query('uploadedImages').collect();
     const oldPending = allPending.filter(
@@ -68,6 +76,7 @@ export const cleanupOldPendingImages = internalMutation({
         !img.commentId &&
         !img.aboutUserId &&
         !img.sectionId &&
+        !img.problemId &&
         !img.isAvatar &&
         img.createdAt < twentyFourHoursAgo,
     );
@@ -160,7 +169,9 @@ export const deletePreviousAvatars = mutation({
 
 export async function associateImagesForSection(ctx: MutationCtx, sectionId: Id<'sections'>, aboutMd: string) {
   const pending = await ctx.db.query('uploadedImages').collect();
-  const pendingUnused = pending.filter((img) => !img.postId && !img.commentId && !img.aboutUserId && !img.sectionId);
+  const pendingUnused = pending.filter(
+    (img) => !img.postId && !img.commentId && !img.aboutUserId && !img.sectionId && !img.problemId,
+  );
 
   for (const img of pendingUnused) {
     const imageUrl = await ctx.storage.getUrl(img.storageId);
@@ -193,6 +204,49 @@ export async function associateImagesForSection(ctx: MutationCtx, sectionId: Id<
         await ctx.storage.delete(img.storageId);
       } catch (e) {
         console.error('Failed to delete unused section image from storage:', e);
+      }
+      await ctx.db.delete(img._id);
+    }
+  }
+}
+
+export async function associateImagesForProblem(ctx: MutationCtx, problemId: Id<'problems'>, contentMd: string) {
+  const pending = await ctx.db.query('uploadedImages').collect();
+  const pendingUnused = pending.filter(
+    (img) => !img.postId && !img.commentId && !img.aboutUserId && !img.sectionId && !img.problemId,
+  );
+
+  for (const img of pendingUnused) {
+    const imageUrl = await ctx.storage.getUrl(img.storageId);
+    const pathSegment = imageUrl ? imageUrl.split('/').pop()?.split('?')[0] : null;
+    const isUsedInBody =
+      contentMd.includes(img.storageId) ||
+      (imageUrl !== null && contentMd.includes(imageUrl)) ||
+      (pathSegment !== null && pathSegment !== undefined && pathSegment !== '' && contentMd.includes(pathSegment));
+
+    if (isUsedInBody) {
+      await ctx.db.patch(img._id, { problemId });
+    }
+  }
+
+  const associated = await ctx.db
+    .query('uploadedImages')
+    .withIndex('by_problem', (q) => q.eq('problemId', problemId))
+    .collect();
+
+  for (const img of associated) {
+    const imageUrl = await ctx.storage.getUrl(img.storageId);
+    const pathSegment = imageUrl ? imageUrl.split('/').pop()?.split('?')[0] : null;
+    const isUsedInBody =
+      contentMd.includes(img.storageId) ||
+      (imageUrl !== null && contentMd.includes(imageUrl)) ||
+      (pathSegment !== null && pathSegment !== undefined && pathSegment !== '' && contentMd.includes(pathSegment));
+
+    if (!isUsedInBody) {
+      try {
+        await ctx.storage.delete(img.storageId);
+      } catch (e) {
+        console.error('Failed to delete unused problem image from storage:', e);
       }
       await ctx.db.delete(img._id);
     }
