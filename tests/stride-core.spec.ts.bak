@@ -1,0 +1,505 @@
+import { test, expect } from '@playwright/test';
+
+let globalPostTitle = 'Edited Help Title';
+
+test.describe('Student & Teacher E2E Flows', () => {
+  test.describe('Student Operations', () => {
+    test.use({ storageState: 'playwright/.auth/student.json' });
+
+    test('Task 1: Auth & Dashboard Welcome', async ({ page }) => {
+      await page.goto('/dashboard');
+      await page.waitForLoadState('networkidle');
+
+      // Verify welcome card has the student's name
+      // const welcomeHeader = page.locator('h1', { hasText: 'Welcome back, Fahim Foysal' });
+      const welcomeHeader = page.locator('h1', { hasText: 'Welcome back, Fahim Faisal' });
+      await welcomeHeader.waitFor({ state: 'visible' });
+      await expect(welcomeHeader).toBeVisible();
+
+      // Verify sidebar links are visible
+      const dashboardLink = page.getByRole('link', { name: 'Dashboard', exact: true });
+      await expect(dashboardLink).toBeVisible();
+
+      const forumLink = page.getByRole('link', { name: 'Forum', exact: true });
+      await expect(forumLink).toBeVisible();
+    });
+
+    test('Task 2: Navigation & Problems', async ({ page }) => {
+      await page.goto('/dashboard');
+      await page.waitForLoadState('networkidle');
+
+      // Locate the section button in the sidebar and click the chevron to expand
+      const sectionButton = page.locator('button', { hasText: 'CSE 1111' });
+      await sectionButton.waitFor({ state: 'visible' });
+      await sectionButton.locator('svg').last().click();
+
+      // Locate the problem link and click it
+      const problemLink = page.getByRole('link', { name: 'Sum of Two Integers' });
+      await problemLink.waitFor({ state: 'visible' });
+      await problemLink.click();
+
+      // Verify CodeMirror editor loads
+      const editor = page.locator('.cm-content');
+      await editor.waitFor({ state: 'visible' });
+      await expect(editor).toBeVisible();
+
+      // Focus editor, clear default code, and insert a Python solution
+      await editor.click();
+      await page.keyboard.press('Control+a');
+      await page.keyboard.press('Backspace');
+      await page.keyboard.insertText('import sys\n\ndef main():\n    line = sys.stdin.read().split()\n    if len(line) >= 2:\n        print(int(line[0]) + int(line[1]))\n\nif __name__ == "__main__":\n    main()');
+
+      // Verify that text was entered
+      await expect(editor).toContainText('def main()');
+    });
+
+    test('Task 3: Judge0 Integration', async ({ page }) => {
+      await page.goto('/dashboard');
+      await page.waitForLoadState('networkidle');
+
+      // Expand sidebar section
+      const sectionButton = page.locator('button', { hasText: 'CSE 1111' });
+      await sectionButton.waitFor({ state: 'visible' });
+      await sectionButton.locator('svg').last().click();
+
+      // Navigate to problem page
+      const problemLink = page.getByRole('link', { name: 'Sum of Two Integers' });
+      await problemLink.waitFor({ state: 'visible' });
+      await problemLink.click();
+
+      // Verify CodeMirror editor loads
+      const editor = page.locator('.cm-content');
+      await editor.waitFor({ state: 'visible' });
+
+      // Select Python explicitly using data-slot attributes
+      const selectTrigger = page.locator('[data-slot="select-trigger"]');
+      await selectTrigger.waitFor({ state: 'visible' });
+      await selectTrigger.click();
+      
+      const pythonOption = page.locator('[data-slot="select-item"]', { hasText: /python/i }).first();
+      await pythonOption.waitFor({ state: 'visible' });
+      await pythonOption.click();
+
+      // Clean and insert solution
+      await editor.click();
+      await page.keyboard.press('Control+a');
+      await page.keyboard.press('Backspace');
+      await page.keyboard.insertText('import sys\n\ndef main():\n    line = sys.stdin.read().split()\n    if len(line) >= 2:\n        print(int(line[0]) + int(line[1]))\n\nif __name__ == "__main__":\n    main()');
+
+      // Set stdin test data (e.g. "5 10")
+      const stdinTextarea = page.getByPlaceholder('Standard Input (stdin)');
+      await stdinTextarea.waitFor({ state: 'visible' });
+      await stdinTextarea.fill('5 10');
+
+      // Click execute code button
+      const executeButton = page.getByRole('button', { name: 'Execute', exact: true });
+      await executeButton.waitFor({ state: 'visible' });
+      await executeButton.click();
+
+      // Verify execution output contains "15" (stdout tab should be active by default)
+      const stdoutContent = page.locator('pre:has-text("15")');
+      await stdoutContent.waitFor({ state: 'visible', timeout: 15000 });
+      await expect(stdoutContent).toContainText('15');
+
+      // Switch to Message tab to verify Judge0 execution status is "Accepted"
+      const messageTab = page.getByRole('tab', { name: 'Message' });
+      await messageTab.waitFor({ state: 'visible' });
+      await messageTab.click();
+
+      // Verify status badge is "Accepted"
+      const statusBadge = page.locator('.status-badge');
+      await statusBadge.waitFor({ state: 'visible' });
+      await expect(statusBadge).toContainText('Accepted');
+    });
+
+    test('Task 4: Profile Management', async ({ page }) => {
+      await page.goto('/dashboard');
+      await page.waitForLoadState('networkidle');
+
+      // Open the user menu in the sidebar footer
+      const userButton = page.getByRole('button', { name: /Fahim Faisal/i });
+      await userButton.waitFor({ state: 'visible' });
+      await userButton.click();
+
+      // Click the Profile link in the dropdown menu
+      const profileItem = page.getByRole('menuitem', { name: 'Profile' });
+      await profileItem.waitFor({ state: 'visible' });
+      await profileItem.click();
+
+      // Verify profile page loaded
+      const header = page.locator('h1', { hasText: 'Fahim Faisal' });
+      await header.waitFor({ state: 'visible' });
+
+      // Click Edit Profile button
+      const editBtn = page.getByRole('button', { name: 'Edit Profile' });
+      await editBtn.waitFor({ state: 'visible' });
+      await editBtn.click();
+
+      // Verify Settings page loaded
+      const settingsHeader = page.locator('h1', { hasText: 'Account Settings' });
+      await settingsHeader.waitFor({ state: 'visible' });
+
+      // Click Generate Random Avatar button
+      const generateBtn = page.getByRole('button', { name: 'Generate Random Avatar' });
+      await generateBtn.waitFor({ state: 'visible' });
+      await generateBtn.click();
+
+      // Wait for success toast
+      await expect(page.getByText('Generated random avatar successfully!')).toBeVisible();
+
+      // Click Remove Photo button to revert to default
+      const removeBtn = page.getByRole('button', { name: 'Remove Photo' });
+      await removeBtn.waitFor({ state: 'visible' });
+      await removeBtn.click();
+
+      // Wait for revert toast
+      await expect(page.getByText('Avatar reverted to default seed shape.')).toBeVisible();
+
+      // Edit bio in Tiptap
+      const bioEditor = page.locator('.ProseMirror');
+      await bioEditor.waitFor({ state: 'visible' });
+      await bioEditor.click();
+      await page.keyboard.press('Control+a');
+      await page.keyboard.press('Backspace');
+      await page.keyboard.insertText('Test Bio');
+
+      // Click Save Biography button
+      const saveBioBtn = page.getByRole('button', { name: 'Save Biography' });
+      await saveBioBtn.waitFor({ state: 'visible' });
+      await saveBioBtn.click();
+
+      // Wait for success toast
+      await expect(page.getByText('Biography saved successfully.')).toBeVisible();
+    });
+
+    test('Task 5: Screen Sharing', async ({ page }) => {
+      await page.goto('/dashboard');
+      await page.waitForLoadState('networkidle');
+
+      // Expand sidebar section
+      const sectionButton = page.locator('button', { hasText: 'CSE 1111' });
+      await sectionButton.waitFor({ state: 'visible' });
+      await sectionButton.locator('svg').last().click();
+
+      // Click the Share Screen link
+      const shareScreenLink = page.getByRole('link', { name: 'Share Screen' });
+      await shareScreenLink.waitFor({ state: 'visible' });
+      await shareScreenLink.click();
+
+      // Verify page title / content loads
+      const header = page.locator('h1', { hasText: 'Section: CSE 1111' });
+      await header.waitFor({ state: 'visible' });
+
+      // Check default status is "Not Sharing"
+      const statusText = page.getByText('Not Sharing');
+      await expect(statusText).toBeVisible();
+
+      // Click the "Share Screen" button to begin sharing
+      const shareBtn = page.getByRole('button', { name: 'Share Screen', exact: true });
+      await shareBtn.waitFor({ state: 'visible' });
+      await shareBtn.click();
+
+      // Verify status changes to "Actively Sharing"
+      const activeStatus = page.getByText('Actively Sharing');
+      await activeStatus.waitFor({ state: 'visible' });
+      await expect(activeStatus).toBeVisible();
+
+      // Verify "Stop Sharing" button is now visible
+      const stopBtn = page.getByRole('button', { name: 'Stop Sharing', exact: true });
+      await expect(stopBtn).toBeVisible();
+
+      // Stop sharing to clean up
+      await stopBtn.click();
+      await expect(statusText).toBeVisible();
+    });
+
+    test('Task 6: Forum - Creation & Interaction', async ({ page }) => {
+      await page.goto('/forum');
+      await page.waitForLoadState('networkidle');
+
+      // Click "Create Post" button
+      const createPostBtn = page.getByRole('button', { name: 'Create Post' });
+      await createPostBtn.waitFor({ state: 'visible' });
+      await createPostBtn.click();
+
+      // Fill in post Title
+      const titleInput = page.locator('#post-title');
+      await titleInput.waitFor({ state: 'visible' });
+      await titleInput.fill('Help needed');
+
+      // Fill in post Body using Tiptap
+      const contentEditor = page.locator('.ProseMirror');
+      await contentEditor.waitFor({ state: 'visible' });
+      await contentEditor.click();
+      await page.keyboard.insertText('Please help me');
+
+
+      // Click "Publish Post"
+      const publishBtn = page.getByRole('button', { name: 'Publish Post' });
+      await publishBtn.waitFor({ state: 'visible' });
+      await publishBtn.click();
+
+      // Verify detailed post page loads
+      const postTitle = page.locator('h1', { hasText: 'Help needed' });
+      await postTitle.waitFor({ state: 'visible' });
+      await expect(postTitle).toBeVisible();
+
+      // Edit post Title and Body
+      const editPostBtn = page.getByRole('button', { name: 'Edit', exact: true });
+      await editPostBtn.waitFor({ state: 'visible' });
+      await editPostBtn.click();
+
+      const editTitleInput = page.locator('#post-title');
+      await editTitleInput.waitFor({ state: 'visible' });
+      const uniqueId = Date.now();
+      globalPostTitle = `Edited Help Title ${uniqueId}`;
+      await editTitleInput.fill(globalPostTitle);
+
+      const editContentEditor = page.locator('.ProseMirror').first();
+      await editContentEditor.waitFor({ state: 'visible' });
+      await editContentEditor.click();
+      await page.keyboard.press('Control+a');
+      await page.keyboard.press('Backspace');
+      await page.keyboard.insertText('Edited Help Content');
+
+      const savePostBtn = page.getByRole('button', { name: 'Save Post' });
+      await savePostBtn.waitFor({ state: 'visible' });
+      await savePostBtn.click();
+
+      // Verify edited title displays
+      const editedTitle = page.locator('h1', { hasText: globalPostTitle });
+      await editedTitle.waitFor({ state: 'visible' });
+      await expect(editedTitle).toBeVisible();
+
+      // Upvote the post
+      const upvotePostBtn = page.getByRole('button', { name: 'Upvote post' });
+      await upvotePostBtn.waitFor({ state: 'visible' });
+      await upvotePostBtn.click();
+
+      const postScore = page.locator('.text-base.font-extrabold');
+      await expect(postScore).toHaveText('1');
+
+      // Create a comment
+      const commentEditor = page.locator('form .ProseMirror');
+      await commentEditor.waitFor({ state: 'visible' });
+      await commentEditor.click();
+      await page.keyboard.insertText('Thanks for posting');
+
+      const postCommentBtn = page.getByRole('button', { name: 'Post Comment' });
+      await postCommentBtn.waitFor({ state: 'visible' });
+      await postCommentBtn.click();
+
+      // Locate the comment block
+      const newComment = page.locator('div.relative.mt-4.flex.flex-col.gap-2').first();
+      await newComment.waitFor({ state: 'visible' });
+      await expect(newComment).toBeVisible();
+
+      // Upvote the comment
+      const upvoteCommentBtn = newComment.getByRole('button', { name: 'Upvote comment' });
+      await upvoteCommentBtn.waitFor({ state: 'visible' });
+      await upvoteCommentBtn.click();
+
+      const commentScore = newComment.locator('div.w-9 span.font-bold');
+      await expect(commentScore).toHaveText('1');
+
+      // Downvote the comment
+      const downvoteCommentBtn = newComment.getByRole('button', { name: 'Downvote comment' });
+      await downvoteCommentBtn.waitFor({ state: 'visible' });
+      await downvoteCommentBtn.click();
+      await expect(commentScore).toHaveText('-1');
+
+      // Downvote the post
+      const downvotePostBtn = page.getByRole('button', { name: 'Downvote post' });
+      await downvotePostBtn.waitFor({ state: 'visible' });
+      await downvotePostBtn.click();
+      await expect(postScore).toHaveText('-1');
+
+      // Edit comment
+      const editCommentBtn = newComment.getByRole('button', { name: 'Edit' });
+      await editCommentBtn.waitFor({ state: 'visible' });
+      await editCommentBtn.click();
+
+      const editCommentEditor = newComment.locator('.ProseMirror');
+      await editCommentEditor.waitFor({ state: 'visible' });
+      await editCommentEditor.click();
+      await page.keyboard.press('Control+a');
+      await page.keyboard.press('Backspace');
+      await page.keyboard.insertText('Edited Comment');
+
+      const saveCommentBtn = newComment.getByRole('button', { name: 'Save' });
+      await saveCommentBtn.waitFor({ state: 'visible' });
+      await saveCommentBtn.click();
+
+      await expect(newComment).toContainText('Edited Comment');
+
+      // Delete comment
+      const deleteCommentBtn = newComment.getByRole('button', { name: 'Delete' });
+      await deleteCommentBtn.waitFor({ state: 'visible' });
+      await deleteCommentBtn.click();
+
+      const confirmDeleteBtn = page.getByRole('alertdialog').getByRole('button', { name: 'Delete' });
+      await confirmDeleteBtn.waitFor({ state: 'visible' });
+      await confirmDeleteBtn.click();
+
+      // Verify comment is marked as deleted
+      await expect(newComment).toContainText('[This comment has been deleted');
+    });
+
+    test('Task 7: Messaging Flow', async ({ page }) => {
+      await page.goto('/chat');
+      await page.waitForLoadState('networkidle');
+
+      // Select SPL Support chat room
+      const chatBtn = page.getByRole('button', { name: /CSE 1111 - SPL Support/i });
+      await chatBtn.waitFor({ state: 'visible' });
+      await chatBtn.click();
+
+      const uniqueId = Date.now();
+      const initialMessage = `Hello Class ${uniqueId}`;
+      const editedMessage = `Hello Team ${uniqueId}`;
+
+      // Type and send a message
+      const messageInput = page.getByPlaceholder('Type a message...');
+      await messageInput.waitFor({ state: 'visible' });
+      await messageInput.fill(initialMessage);
+      await page.keyboard.press('Enter');
+
+      // Verify message is visible
+      const msgBubble = page.getByText(initialMessage).last();
+      await msgBubble.waitFor({ state: 'visible' });
+      await expect(msgBubble).toBeVisible();
+
+      // Locate the message group container for hover
+      const messageGroup = page.locator('div.group', { hasText: initialMessage }).last();
+      await messageGroup.waitFor({ state: 'visible' });
+      await messageGroup.hover();
+
+      // Click message actions trigger
+      const actionTrigger = messageGroup.locator('button').last();
+      await actionTrigger.waitFor({ state: 'visible' });
+      await actionTrigger.click();
+
+      // Click Edit option in menu
+      const editMenuItem = page.getByRole('menuitem', { name: 'Edit' });
+      await editMenuItem.waitFor({ state: 'visible' });
+      await editMenuItem.click();
+
+      // Type new message text and save
+      const editInput = page.locator('div.group').last().locator('input');
+      await editInput.waitFor({ state: 'visible' });
+      await editInput.fill(editedMessage);
+      await page.keyboard.press('Enter');
+
+      // Verify message is updated
+      const updatedBubble = page.getByText(editedMessage).last();
+      await updatedBubble.waitFor({ state: 'visible' });
+      await expect(updatedBubble).toBeVisible();
+
+      // Locate updated message group and delete it
+      const updatedMessageGroup = page.locator('div.group', { hasText: editedMessage }).last();
+      await updatedMessageGroup.waitFor({ state: 'visible' });
+      await updatedMessageGroup.hover();
+
+      const updatedActionTrigger = updatedMessageGroup.locator('button').last();
+      await updatedActionTrigger.waitFor({ state: 'visible' });
+      await updatedActionTrigger.click();
+
+      const deleteMenuItem = page.getByRole('menuitem', { name: 'Delete' });
+      await deleteMenuItem.waitFor({ state: 'visible' });
+      await deleteMenuItem.click();
+
+      // Verify message is removed
+      await expect(page.getByText(editedMessage)).toBeHidden();
+    });
+  });
+
+  test.describe('Teacher Operations', () => {
+    test.use({ storageState: 'playwright/.auth/teacher.json' });
+
+    test('Task 8: Teacher Dashboard & CCTV', async ({ page }) => {
+      await page.goto('/dashboard');
+      await page.waitForLoadState('networkidle');
+
+      // Verify welcome card has the teacher's name
+      const welcomeHeader = page.locator('h1', { hasText: 'Welcome back, Asnuva Tanvin' });
+      await welcomeHeader.waitFor({ state: 'visible' });
+      await expect(welcomeHeader).toBeVisible();
+
+      // Expand sidebar section for CSE 1111
+      const sectionButton = page.locator('button', { hasText: 'CSE 1111' });
+      await sectionButton.waitFor({ state: 'visible' });
+      await sectionButton.locator('svg').last().click();
+
+      // Click CCTV Hub link
+      const cctvLink = page.getByRole('link', { name: 'CCTV Hub' });
+      await cctvLink.waitFor({ state: 'visible' });
+      await cctvLink.click();
+
+      // Verify CCTV page loaded
+      const cctvHeader = page.locator('h1', { hasText: 'CCTV Hub' });
+      await cctvHeader.waitFor({ state: 'visible' });
+      await expect(cctvHeader).toBeVisible();
+
+      // Verify enrolled students are displayed
+      await expect(page.locator('text=Fahim Faisal').first()).toBeVisible();
+      await expect(page.locator('text=Rakibul Hasan').first()).toBeVisible();
+      await expect(page.locator('text=Sadia Tabassum').first()).toBeVisible();
+    });
+
+    test('Task 9: Playback & Cleanup', async ({ page }) => {
+      await page.goto('/dashboard');
+      await page.waitForLoadState('networkidle');
+
+      // Expand sidebar section for CSE 1111
+      const sectionButton = page.locator('button', { hasText: 'CSE 1111' });
+      await sectionButton.waitFor({ state: 'visible' });
+      await sectionButton.locator('svg').last().click();
+
+      // Click Playback link under active activities
+      const playbackLink = page.getByRole('link', { name: 'Playback' });
+      await playbackLink.waitFor({ state: 'visible' });
+      await playbackLink.click();
+
+      // Click "Review" on the first problem
+      const reviewBtn = page.getByRole('button', { name: 'Review' }).first();
+      await reviewBtn.waitFor({ state: 'visible' });
+      await reviewBtn.click();
+
+      // Click "Run Last Snapshot" button
+      const runBtn = page.getByRole('button', { name: /Run Last Snapshot/i });
+      await runBtn.waitFor({ state: 'visible' });
+      await runBtn.click();
+
+      // Navigate to forum
+      const forumLink = page.getByRole('link', { name: 'Forum', exact: true });
+      await forumLink.waitFor({ state: 'visible' });
+      await forumLink.click();
+
+      // Delete student's post
+      const postCard = page.locator('div[data-slot="card"]', { hasText: globalPostTitle });
+      await postCard.waitFor({ state: 'visible' });
+      const deleteBtn = postCard.getByTitle('Delete Post');
+      await deleteBtn.waitFor({ state: 'visible' });
+      await deleteBtn.click();
+
+      // Confirm deletion in the alert dialog
+      const confirmDeleteBtn = page.getByRole('alertdialog').getByRole('button', { name: 'Delete' });
+      await confirmDeleteBtn.waitFor({ state: 'visible' });
+      await confirmDeleteBtn.click();
+
+      // Verify the post card is deleted
+      await expect(postCard).toBeHidden();
+
+      // Logout
+      const userButton = page.getByRole('button', { name: /Asnuva Tanvin/i });
+      await userButton.waitFor({ state: 'visible' });
+      await userButton.click();
+
+      const logoutItem = page.getByRole('menuitem', { name: 'Log out' });
+      await logoutItem.waitFor({ state: 'visible' });
+      await logoutItem.click();
+
+      await expect(page).toHaveURL(/.*login/);
+    });
+  });
+});

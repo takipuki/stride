@@ -52,7 +52,7 @@
           <span>{(result.memory / 1024).toFixed(1)}MB</span>
         {/if}
         {#if result.status}
-          <span class="ml-auto">{result.status.description}</span>
+          <span class="status-badge ml-auto">{result.status.description}</span>
         {/if}
       </div>
     </div>
@@ -106,7 +106,7 @@
           <div class="mt-4 grid grid-cols-[100px_1fr] gap-1 text-xs">
             {#if result.status}
               <div class="font-semibold text-muted-foreground">Status:</div>
-              <div>{result.status.description}</div>
+              <div class="status-badge">{result.status.description}</div>
             {/if}
             {#if result.time != null}
               <div class="font-semibold text-muted-foreground">Time:</div>
