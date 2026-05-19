@@ -149,7 +149,7 @@
   // ─── Test case management ─────────────────────────────────────────────────
   let selectedLanguageId = $state<string | undefined>(undefined);
   let isExecuting = $state(false);
-  let results = new SvelteMap<string, SubmissionResult>();
+  const results = new SvelteMap<string, SubmissionResult>();
 
   // Auto-run tests with last snapshot when ready
   $effect(() => {
@@ -250,7 +250,7 @@
     if (!code) return;
 
     isExecuting = true;
-    results = new SvelteMap();
+    results.clear();
 
     try {
       const submissions = testCases.map((tc) => ({
@@ -269,13 +269,12 @@
 
       const data: { submissions: SubmissionResult[] } = await res.json();
 
-      const newResults = new SvelteMap<string, SubmissionResult>();
+      results.clear();
       testCases.forEach((tc, i) => {
         if (data.submissions[i]) {
-          newResults.set(tc._id, data.submissions[i]);
+          results.set(tc._id, data.submissions[i]);
         }
       });
-      results = newResults;
     } catch (err) {
       console.error('Batch execution error:', err);
     } finally {
