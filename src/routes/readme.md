@@ -33,10 +33,11 @@ This document outlines the URL structure for the application and what each page 
 
 ### Activities (Exams & Live Classes)
 
-- [ ] `/(app)/activities/new/+page.svelte` — Create a new exam or class.
+- [x] `/(app)/activities/+page.svelte` — Activities Hub listing scheduled classes, exams, and performance reviews.
+- [x] `/(app)/activities/new/+page.svelte` — Create a new exam or class.
+- [x] `/(app)/activities/[activityId]/+page.svelte` — Scoreboard showing all student submissions and grades.
 - [x] `/(app)/activities/[activityId]/[problemId]/+page.svelte` — The live room (Exam interface or class viewer).
-- [ ] `/(app)/activities/[activityId]/edit/+page.svelte` — Update activity settings, attach and reorder problems.
-- [ ] `/(app)/activities/[activityId]/results/+page.svelte` — Scoreboard showing all student submissions and grades.
+- [x] `/(app)/activities/[activityId]/edit/+page.svelte` — Update activity settings, attach and reorder problems.
 - [x] `/(app)/activities/[activityId]/playback/+page.svelte` — Dashboard for reviewing student code progression.
 - [x] `/(app)/activities/[activityId]/playback/[problemId]/[studentId]/+page.svelte` — Playback of a student's code snapshots for a specific problem.
 
