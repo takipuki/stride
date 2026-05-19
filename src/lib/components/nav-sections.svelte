@@ -1,9 +1,9 @@
 <script lang="ts">
+  import ActivityIcon from '@lucide/svelte/icons/activity';
   import BookOpenCheckIcon from '@lucide/svelte/icons/book-open-check';
   import CctvIcon from '@lucide/svelte/icons/cctv';
   import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
   import CircleIcon from '@lucide/svelte/icons/circle';
-  import ClipboardListIcon from '@lucide/svelte/icons/clipboard-list';
   import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
   import PencilIcon from '@lucide/svelte/icons/pencil';
   import PlayCircleIcon from '@lucide/svelte/icons/play-circle';
@@ -154,9 +154,9 @@
                           <Sidebar.MenuSubItem>
                             <Sidebar.MenuSubButton>
                               {#snippet child({ props })}
-                                <a href="/activities/{activity._id}/results" {...props}>
-                                  <ClipboardListIcon class="size-3 shrink-0 text-sidebar-foreground/60" />
-                                  <span class="truncate text-xs text-sidebar-foreground/60"> Results </span>
+                                <a href="/activities/{activity._id}" {...props}>
+                                  <ActivityIcon class="size-3 shrink-0 text-sidebar-foreground/60" />
+                                  <span class="truncate text-xs text-sidebar-foreground/60"> Status </span>
                                 </a>
                               {/snippet}
                             </Sidebar.MenuSubButton>
