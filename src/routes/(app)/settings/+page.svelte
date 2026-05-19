@@ -280,12 +280,10 @@
   }
 
   // Submit Avatar Changes
-  let isSavingAvatar = $state(false);
   async function saveAvatar(e: Event) {
     e.preventDefault();
     if (!$session?.userId) return;
 
-    isSavingAvatar = true;
     try {
       await client.mutation(api.users.updateProfile, {
         id: $session.userId,
@@ -302,8 +300,6 @@
     } catch (err) {
       console.error('Failed to save avatar photo:', err);
       toast.error('Failed to save avatar photo.');
-    } finally {
-      isSavingAvatar = false;
     }
   }
 

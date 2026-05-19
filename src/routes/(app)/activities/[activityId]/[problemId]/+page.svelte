@@ -11,7 +11,6 @@
   import ProblemContent from '$lib/components/problem-content.svelte';
   import SubmissionResultView from '$lib/components/submission-result-view.svelte';
   import { Button } from '$lib/components/ui/button/index.js';
-  import * as Card from '$lib/components/ui/card/index.js';
   import * as Resizable from '$lib/components/ui/resizable/index.js';
   import { Spinner } from '$lib/components/ui/spinner/index.js';
   import { Textarea } from '$lib/components/ui/textarea/index.js';

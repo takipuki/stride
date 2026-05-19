@@ -52,7 +52,7 @@ test.describe('Teacher Operations', () => {
     try {
       const postInfo = JSON.parse(fs.readFileSync('playwright/.auth/post-info.json', 'utf8'));
       postTitle = postInfo.postTitle;
-    } catch (e) {
+    } catch (_e) {
       console.warn('Could not read post-info.json, using default fallback title');
     }
 
