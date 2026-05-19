@@ -165,7 +165,7 @@
     <Card.Root class="border bg-card/45 shadow-sm backdrop-blur-md">
       <Card.Header class="p-6 pb-3">
         <Card.Title class="flex items-center gap-2 text-lg font-bold tracking-tight">
-          <Code2 class="h-5 w-5 text-primary" /> Test Cases / Input & Outputs
+          <Code2 class="h-5 w-5 text-primary" /> Test Cases
         </Card.Title>
         <Card.Description>These inputs and outputs will be used to automatically validate submissions.</Card.Description
         >

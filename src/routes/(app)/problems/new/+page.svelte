@@ -1,6 +1,5 @@
 <script lang="ts">
   import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-  import Code2 from '@lucide/svelte/icons/code-2';
   import Loader2 from '@lucide/svelte/icons/loader-2';
   import Plus from '@lucide/svelte/icons/plus';
   import Trash2 from '@lucide/svelte/icons/trash-2';
@@ -125,7 +124,7 @@
       <!-- Problem Details Form -->
       <Card.Root class="border bg-card/45 shadow-sm backdrop-blur-md">
         <Card.Header class="p-6">
-          <Card.Title class="text-lg font-bold tracking-tight">1. Problem Details</Card.Title>
+          <Card.Title class="text-lg font-bold tracking-tight">Problem Details</Card.Title>
           <Card.Description>Provide a concise title and clear details about the algorithmic challenge.</Card.Description
           >
         </Card.Header>
@@ -161,9 +160,7 @@
       <!-- Test Cases Suite Builder -->
       <Card.Root class="border bg-card/45 shadow-sm backdrop-blur-md">
         <Card.Header class="p-6">
-          <Card.Title class="flex items-center gap-1.5 text-lg font-bold tracking-tight">
-            <Code2 class="h-5 w-5 text-primary" /> 2. Seed Test Cases
-          </Card.Title>
+          <Card.Title class="flex items-center gap-1.5 text-lg font-bold tracking-tight">Seed Test Cases</Card.Title>
           <Card.Description>Add the test cases that student submissions will be evaluated against.</Card.Description>
         </Card.Header>
         <Separator />
@@ -220,7 +217,7 @@
             <h4 class="text-xs font-bold tracking-wider text-muted-foreground uppercase">Create Custom Case</h4>
             <div class="grid gap-4 md:grid-cols-2">
               <div class="flex flex-col gap-1.5">
-                <Label for="new-input" class="text-xs font-semibold">StdIn (Input)</Label>
+                <Label for="new-input" class="text-xs font-semibold">stdin</Label>
                 <Textarea
                   id="new-input"
                   placeholder="Input arguments or strings (optional)..."
@@ -230,9 +227,7 @@
                 />
               </div>
               <div class="flex flex-col gap-1.5">
-                <Label for="new-output" class="text-xs font-semibold text-primary"
-                  >StdOut (Expected Output - Required)</Label
-                >
+                <Label for="new-output" class="text-xs font-semibold text-primary">stdout</Label>
                 <Textarea
                   id="new-output"
                   placeholder="Console output sequence..."
@@ -253,7 +248,7 @@
                 disabled={!newCaseOutput.trim()}
                 class="cursor-pointer gap-1.5 font-bold"
               >
-                <Plus class="h-4 w-4" /> Add to Suite
+                <Plus class="h-4 w-4" /> Add
               </Button>
             </div>
           </div>

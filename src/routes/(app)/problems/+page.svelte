@@ -7,7 +7,6 @@
   import Plus from '@lucide/svelte/icons/plus';
   import Search from '@lucide/svelte/icons/search';
   import Trash2 from '@lucide/svelte/icons/trash-2';
-  import User from '@lucide/svelte/icons/user';
   import { useConvexClient, useQuery } from 'convex-svelte';
   import { toast } from 'svelte-sonner';
   import { fade } from 'svelte/transition';
