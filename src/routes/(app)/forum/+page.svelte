@@ -226,7 +226,7 @@
                       }}
                       class={cn(
                         'rounded p-1 transition-colors hover:bg-muted',
-                        post.userVote === 1 ? 'text-orange-500 hover:bg-orange-500/10' : 'text-muted-foreground',
+                        post.userVote === 1 ? 'text-warning hover:bg-warning/10' : 'text-muted-foreground',
                       )}
                       aria-label="Upvote"
                     >
@@ -235,8 +235,8 @@
                     <span
                       class={cn(
                         'text-sm font-bold tracking-tight',
-                        post.userVote === 1 && 'text-orange-500',
-                        post.userVote === -1 && 'text-blue-500',
+                        post.userVote === 1 && 'text-warning',
+                        post.userVote === -1 && 'text-info',
                         post.userVote === 0 && 'text-foreground/80',
                       )}
                     >
@@ -249,7 +249,7 @@
                       }}
                       class={cn(
                         'rounded p-1 transition-colors hover:bg-muted',
-                        post.userVote === -1 ? 'text-blue-500 hover:bg-blue-500/10' : 'text-muted-foreground',
+                        post.userVote === -1 ? 'text-info hover:bg-info/10' : 'text-muted-foreground',
                       )}
                       aria-label="Downvote"
                     >
@@ -366,7 +366,7 @@
 
     <!-- Community guidelines -->
     <div class="relative flex flex-col gap-3 rounded-xl border bg-card p-5 shadow-sm">
-      <div class="flex items-center gap-2 text-sm font-bold tracking-wider text-orange-500 uppercase">
+      <div class="flex items-center gap-2 text-sm font-bold tracking-wider text-warning uppercase">
         <ShieldAlert class="h-4 w-4" />
         Community Rules
       </div>

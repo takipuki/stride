@@ -285,10 +285,10 @@
       <div class="flex w-fit items-center gap-3 rounded-xl border border-border/30 bg-background/50 px-4 py-2">
         {#if status === 'sharing'}
           <div class="relative flex h-3 w-3">
-            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex h-3 w-3 rounded-full bg-emerald-500"></span>
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75"></span>
+            <span class="relative inline-flex h-3 w-3 rounded-full bg-success"></span>
           </div>
-          <span class="text-xs font-semibold text-emerald-400">Actively Sharing</span>
+          <span class="text-xs font-semibold text-success">Actively Sharing</span>
         {:else}
           <div class="relative flex h-3 w-3">
             <span class="relative inline-flex h-3 w-3 rounded-full bg-muted-foreground/60"></span>
@@ -347,7 +347,7 @@
             </p>
           </div>
           <div class="flex gap-3 text-xs text-muted-foreground">
-            <CheckCircleIcon class="size-4 shrink-0 text-emerald-500/70" />
+            <CheckCircleIcon class="size-4 shrink-0 text-success/70" />
             <p>Do not close this browser tab while sharing. Closing it will terminate the screen share.</p>
           </div>
         </div>
@@ -364,7 +364,7 @@
           <span class="text-sm font-semibold text-foreground">Screen Preview</span>
           {#if sharing}
             <span
-              class="flex animate-pulse items-center gap-1.5 rounded border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-emerald-400 uppercase"
+              class="flex animate-pulse items-center gap-1.5 rounded border border-success/20 bg-success/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-success uppercase"
             >
               Live
             </span>
@@ -379,7 +379,7 @@
             muted
             autoplay
             playsinline
-            class="aspect-video h-full w-full rounded-lg border border-border/20 bg-black/60 shadow-md transition-all duration-500 {sharing
+            class="aspect-video h-full w-full rounded-lg border border-border/20 bg-pure-black/60 shadow-md transition-all duration-500 {sharing
               ? 'scale-100 opacity-100'
               : 'pointer-events-none absolute scale-95 opacity-0'}"
           ></video>

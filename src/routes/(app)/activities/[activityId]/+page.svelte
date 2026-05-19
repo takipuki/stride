@@ -298,12 +298,7 @@
                           href="/activities/${activityId}/playback/${problemId}/${student._id}"
                           class="inline-block transition-transform hover:scale-105"
                         >
-                          <Badge
-                            variant={isAccepted ? 'default' : 'destructive'}
-                            class="cursor-pointer text-xs {isAccepted
-                              ? 'bg-green-600 text-white hover:bg-green-700'
-                              : ''}"
-                          >
+                          <Badge variant={isAccepted ? 'success' : 'destructive'} class="cursor-pointer text-xs">
                             {sub.judgeVerdict ?? 'Submitted'}
                           </Badge>
                         </a>

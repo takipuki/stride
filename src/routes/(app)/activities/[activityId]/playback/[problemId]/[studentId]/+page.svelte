@@ -510,7 +510,7 @@
                     <div class="flex items-center gap-2">
                       <span class="text-xs font-medium text-muted-foreground">Test #{i + 1}</span>
                       {#if verdict === 'pass'}
-                        <Badge variant="default" class="bg-green-600 text-xs">
+                        <Badge variant="success" class="text-xs">
                           <CheckIcon class="mr-1 size-3" />
                           Pass
                         </Badge>

@@ -363,7 +363,7 @@
               onclick={() => votePost(1)}
               class={cn(
                 'rounded p-1 transition-colors hover:bg-muted',
-                post.userVote === 1 ? 'text-orange-500 hover:bg-orange-500/10' : 'text-muted-foreground',
+                post.userVote === 1 ? 'text-warning hover:bg-warning/10' : 'text-muted-foreground',
               )}
               aria-label="Upvote post"
             >
@@ -372,8 +372,8 @@
             <span
               class={cn(
                 'text-base font-extrabold tracking-tight',
-                post.userVote === 1 && 'text-orange-500',
-                post.userVote === -1 && 'text-blue-500',
+                post.userVote === 1 && 'text-warning',
+                post.userVote === -1 && 'text-info',
                 post.userVote === 0 && 'text-foreground/80',
               )}
             >
@@ -383,7 +383,7 @@
               onclick={() => votePost(-1)}
               class={cn(
                 'rounded p-1 transition-colors hover:bg-muted',
-                post.userVote === -1 ? 'text-blue-500 hover:bg-blue-500/10' : 'text-muted-foreground',
+                post.userVote === -1 ? 'text-info hover:bg-info/10' : 'text-muted-foreground',
               )}
               aria-label="Downvote post"
             >
@@ -562,7 +562,7 @@
                         onclick={() => voteComment(comment._id, 1, comment.userVote)}
                         class={cn(
                           'rounded p-0.5 transition-colors hover:bg-muted',
-                          comment.userVote === 1 ? 'text-orange-500' : 'text-muted-foreground',
+                          comment.userVote === 1 ? 'text-warning' : 'text-muted-foreground',
                         )}
                         aria-label="Upvote comment"
                       >
@@ -572,8 +572,8 @@
                     <span
                       class={cn(
                         'font-bold',
-                        comment.userVote === 1 && 'text-orange-500',
-                        comment.userVote === -1 && 'text-blue-500',
+                        comment.userVote === 1 && 'text-warning',
+                        comment.userVote === -1 && 'text-info',
                         comment.userVote === 0 && 'text-foreground/70',
                       )}
                     >
@@ -584,7 +584,7 @@
                         onclick={() => voteComment(comment._id, -1, comment.userVote)}
                         class={cn(
                           'rounded p-0.5 transition-colors hover:bg-muted',
-                          comment.userVote === -1 ? 'text-blue-500' : 'text-muted-foreground',
+                          comment.userVote === -1 ? 'text-info' : 'text-muted-foreground',
                         )}
                         aria-label="Downvote comment"
                       >
