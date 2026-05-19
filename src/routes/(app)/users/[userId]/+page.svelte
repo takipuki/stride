@@ -489,6 +489,7 @@
                       <div
                         class="prose prose-sm line-clamp-3 max-w-none py-1 leading-relaxed text-foreground/90 dark:prose-invert"
                       >
+                        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                         {@html DOMPurify.sanitize(comment.content)}
                       </div>
 
