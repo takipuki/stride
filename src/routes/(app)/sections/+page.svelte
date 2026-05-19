@@ -7,6 +7,7 @@
   import Trash2 from '@lucide/svelte/icons/trash-2';
   import Users from '@lucide/svelte/icons/users';
   import { useConvexClient, useQuery } from 'convex-svelte';
+  import DOMPurify from 'isomorphic-dompurify';
   import { toast } from 'svelte-sonner';
 
   import { api } from '$convex/_generated/api.js';
@@ -160,41 +161,41 @@
                 {section.name}
               </Card.Title>
             </div>
-            <Card.Description class="mt-1 line-clamp-2 text-xs text-muted-foreground/90">
-              <!-- Render text without raw html tags if rich-text is saved -->
-              {section.aboutMd
-                ? section.aboutMd.replace(/<[^>]*>/g, ' ').substring(0, 100) +
-                  (section.aboutMd.length > 100 ? '...' : '')
-                : 'No description provided.'}
-            </Card.Description>
+            <div
+              class="prose prose-sm mt-1 line-clamp-3 max-w-none text-xs text-muted-foreground/90 dark:prose-invert [&_ol]:my-1 [&_p]:my-1 [&_ul]:my-1"
+            >
+              {#if section.aboutMd}
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                {@html DOMPurify.sanitize(section.aboutMd)}
+              {:else}
+                <p>No description provided.</p>
+              {/if}
+            </div>
           </Card.Header>
 
-          <Card.Content class="flex flex-1 flex-col justify-end gap-4 py-2">
-            <!-- Single Instructor Profile -->
-            <div class="flex flex-col gap-1.5">
-              <span class="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">Instructor</span>
-              {#if !section.teachers || section.teachers.length === 0}
-                <span class="text-xs text-muted-foreground italic">No instructor assigned</span>
-              {:else}
-                {@const instructor = section.teachers[0]}
-                {#if instructor}
-                  <div class="flex items-center gap-2 py-0.5">
-                    <Avatar.Root class="h-7 w-7 border border-border shadow-xs">
+          <Card.Content class="flex flex-1 flex-col justify-end py-2">
+            <!-- Instructor left aligned and Enrollment number on right -->
+            <div class="flex items-center justify-between border-t border-border/30 pt-3">
+              <div class="flex items-center gap-2">
+                {#if !section.teachers || section.teachers.length === 0}
+                  <span class="text-xs text-muted-foreground italic">No instructor</span>
+                {:else}
+                  {@const instructor = section.teachers[0]}
+                  {#if instructor}
+                    <Avatar.Root class="h-6 w-6 border border-border shadow-xs">
                       <Avatar.Image src={instructor.avatarUrl} alt={instructor.name} />
                       <Avatar.Fallback class="bg-primary/5 text-[9px] font-bold text-primary">
                         {instructor.name.substring(0, 2).toUpperCase()}
                       </Avatar.Fallback>
                     </Avatar.Root>
-                    <span class="text-xs leading-none font-semibold text-foreground">{instructor.name}</span>
-                  </div>
+                    <span class="max-w-[120px] truncate text-xs font-semibold text-foreground" title={instructor.name}>
+                      {instructor.name}
+                    </span>
+                  {/if}
                 {/if}
-              {/if}
-            </div>
+              </div>
 
-            <!-- Student Count Badge -->
-            <div class="flex items-center justify-between border-t border-border/30 pt-3">
-              <span class="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">Enrollment</span>
-              <Badge variant="secondary" class="border-border bg-muted/40 px-2 py-0.5 text-xs font-bold">
+              <Badge variant="secondary" class="shrink-0 border-border bg-muted/40 px-2 py-0.5 text-xs font-bold">
                 <Users class="mr-1 h-3.5 w-3.5 text-muted-foreground" />
                 {(section.students || []).length} Student(s)
               </Badge>
@@ -203,7 +204,7 @@
 
           <Card.Footer class="flex gap-2 border-t border-border/40 bg-muted/5 p-3">
             <Button href="/sections/{section._id}" size="sm" class="h-8 flex-1 text-xs font-semibold">
-              Enter Hub
+              View More
               <ArrowRight class="ml-1.5 h-3.5 w-3.5" />
             </Button>
             {#if userRole === 'admin'}

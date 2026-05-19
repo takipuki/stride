@@ -185,12 +185,14 @@ export default defineSchema({
     postId: v.optional(v.id('posts')),
     commentId: v.optional(v.id('comments')),
     aboutUserId: v.optional(v.id('users')),
+    sectionId: v.optional(v.id('sections')),
     isAvatar: v.optional(v.boolean()),
     createdAt: v.number(),
   })
     .index('by_post', ['postId'])
     .index('by_comment', ['commentId'])
     .index('by_aboutUserId', ['aboutUserId'])
+    .index('by_section', ['sectionId'])
     .index('by_storage', ['storageId'])
     .index('by_author', ['authorId']),
 });
