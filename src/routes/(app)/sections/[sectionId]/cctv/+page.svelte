@@ -306,13 +306,13 @@
             <!-- Status Indicator Badge -->
             {#if isLive}
               <span
-                class="flex animate-pulse items-center gap-1 rounded border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold tracking-wider text-emerald-400 uppercase"
+                class="flex animate-pulse items-center gap-1 rounded border border-success/20 bg-success/10 px-2 py-0.5 text-[9px] font-bold tracking-wider text-success uppercase"
               >
                 Live
               </span>
             {:else if connection && connection.status === 'connecting'}
               <span
-                class="flex animate-pulse items-center gap-1 rounded border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[9px] font-bold tracking-wider text-amber-400 uppercase"
+                class="flex animate-pulse items-center gap-1 rounded border border-warning/20 bg-warning/10 px-2 py-0.5 text-[9px] font-bold tracking-wider text-warning uppercase"
               >
                 Connecting
               </span>
@@ -333,12 +333,12 @@
                 muted
                 autoplay
                 playsinline
-                class="h-full w-full bg-black object-contain"
+                class="h-full w-full bg-pure-black object-contain"
               ></video>
 
               <!-- Hover Control Overlay -->
               <div
-                class="absolute inset-0 flex items-center justify-center gap-4 bg-black/60 opacity-0 transition-opacity duration-300 group-hover/panel:opacity-100"
+                class="absolute inset-0 flex items-center justify-center gap-4 bg-pure-black/60 opacity-0 transition-opacity duration-300 group-hover/panel:opacity-100"
               >
                 <button
                   onclick={() => {
@@ -415,7 +415,7 @@
   {@const fullscreenStudentObj = studentsList.find((s) => s?._id === fullscreenStudentId)}
   {@const fsConnection = activeStreams[fullscreenStudentId]}
 
-  <div class="animate-fade-in fixed inset-0 z-50 flex flex-col bg-black/90 p-6 backdrop-blur-md">
+  <div class="animate-fade-in fixed inset-0 z-50 flex flex-col bg-pure-black/90 p-6 backdrop-blur-md">
     <!-- Overlay Header -->
     <div class="mb-4 flex w-full items-center justify-between border-b border-border/20 pb-4">
       <div class="flex items-center gap-3">
@@ -429,8 +429,8 @@
           </div>
         {/if}
         <div>
-          <h2 class="text-md font-bold text-white">{fullscreenStudentObj?.name || 'Student Screen'}</h2>
-          <p class="text-xs text-zinc-400">Fullscreen Invigilation Mode</p>
+          <h2 class="text-md font-bold text-pure-white">{fullscreenStudentObj?.name || 'Student Screen'}</h2>
+          <p class="text-xs text-cinema-text">Fullscreen Invigilation Mode</p>
         </div>
       </div>
 
@@ -439,7 +439,7 @@
         onclick={() => {
           fullscreenStudentId = null;
         }}
-        class="flex cursor-pointer items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 p-2.5 text-white transition-all duration-300 hover:scale-105 hover:bg-zinc-800 hover:text-white"
+        class="flex cursor-pointer items-center justify-center rounded-xl border border-cinema-border bg-cinema-bg p-2.5 text-pure-white transition-all duration-300 hover:scale-105 hover:bg-cinema-border hover:text-pure-white"
       >
         <Minimize2Icon class="size-4" />
       </button>
@@ -447,16 +447,18 @@
 
     <!-- High-res overlay video frame -->
     <div
-      class="relative flex w-full flex-1 items-center justify-center overflow-hidden rounded-2xl border border-border/20 bg-black/60"
+      class="relative flex w-full flex-1 items-center justify-center overflow-hidden rounded-2xl border border-border/20 bg-pure-black/60"
     >
       {#if fsConnection && fsConnection.status === 'connected' && fsConnection.stream}
         <video use:attachStream={fsConnection.stream} muted autoplay playsinline class="h-full w-full object-contain"
         ></video>
       {:else}
         <div class="flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
-          <CircleAlertIcon class="mb-4 size-16 animate-pulse text-amber-500" />
-          <h3 class="text-md font-bold text-white">Stream Disconnected</h3>
-          <p class="mt-1 max-w-xs text-xs text-zinc-400">The screen stream was interrupted or closed by the student.</p>
+          <CircleAlertIcon class="mb-4 size-16 animate-pulse text-warning" />
+          <h3 class="text-md font-bold text-pure-white">Stream Disconnected</h3>
+          <p class="mt-1 max-w-xs text-xs text-cinema-text">
+            The screen stream was interrupted or closed by the student.
+          </p>
         </div>
       {/if}
     </div>

@@ -99,8 +99,8 @@
     if (/[^a-zA-Z0-9]/.test(newPassword)) poolSize += 33;
     const entropy = newPassword.length * Math.log2(poolSize || 1);
     if (entropy < 40) return 'text-destructive';
-    if (entropy < 60) return 'text-orange-500';
-    return 'text-green-500';
+    if (entropy < 60) return 'text-warning';
+    return 'text-success';
   });
 
   // Populate form fields once profile loads
@@ -458,9 +458,9 @@
 
                 <!-- Camera hover overlay -->
                 <div
-                  class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  class="absolute inset-0 flex items-center justify-center bg-pure-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                 >
-                  <Camera class="h-6 w-6 text-white" />
+                  <Camera class="h-6 w-6 text-pure-white" />
                 </div>
               </button>
             </div>
@@ -619,8 +619,8 @@
                     class={cn(
                       'h-full transition-all duration-300',
                       passwordStrengthColor === 'text-destructive' && 'w-1/3 bg-destructive',
-                      passwordStrengthColor === 'text-orange-500' && 'w-2/3 bg-orange-500',
-                      passwordStrengthColor === 'text-green-500' && 'w-full bg-green-500',
+                      passwordStrengthColor === 'text-warning' && 'w-2/3 bg-warning',
+                      passwordStrengthColor === 'text-success' && 'w-full bg-success',
                     )}
                   ></div>
                 </div>
@@ -629,9 +629,9 @@
 
             <!-- Password Info -->
             <div
-              class="flex items-start gap-2.5 rounded-lg border border-orange-500/20 bg-orange-500/5 p-3 text-xs leading-relaxed text-muted-foreground"
+              class="flex items-start gap-2.5 rounded-lg border border-warning/20 bg-warning/5 p-3 text-xs leading-relaxed text-muted-foreground"
             >
-              <ShieldAlert class="mt-0.5 h-4.5 w-4.5 shrink-0 text-orange-500" />
+              <ShieldAlert class="mt-0.5 h-4.5 w-4.5 shrink-0 text-warning" />
               <div>
                 <span class="font-bold text-foreground">Important:</span> Choose a secure, robust password. You will need
                 to log back in using this new password on your next visit.

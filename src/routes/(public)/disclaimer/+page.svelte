@@ -31,7 +31,7 @@
       description:
         'The platform is provided "as-is" without any warranties of any kind. Developers assume no liability for data loss, system downtime, or security issues.',
       icon: InfoIcon,
-      color: 'text-blue-500 bg-blue-500/10',
+      color: 'text-info bg-info/10',
     },
   ];
 </script>

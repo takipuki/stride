@@ -25,13 +25,13 @@
       title: 'P2P Screenshare',
       description: 'Secure, low-latency live monitoring to support students exactly when they need it.',
       icon: MonitorIcon,
-      color: 'text-blue-500',
+      color: 'text-info',
     },
     {
       title: 'Academic Forum',
       description: 'Integrated community spaces for students and alumni to collaborate and grow.',
       icon: MessageSquareIcon,
-      color: 'text-orange-500',
+      color: 'text-warning',
     },
   ];
 
@@ -182,7 +182,7 @@
               size="lg"
               variant="secondary"
               href="/login"
-              class="h-16 rounded-full px-12 text-lg font-bold shadow-xl transition-all hover:scale-105 hover:bg-white hover:text-black"
+              class="h-16 rounded-full px-12 text-lg font-bold shadow-xl transition-all hover:scale-105 hover:bg-pure-white hover:text-pure-black"
             >
               Get Started Now
             </Button>
