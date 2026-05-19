@@ -130,7 +130,10 @@
     @apply bg-background text-foreground;
   }
   html {
-    @apply font-sans;
+    @apply scroll-smooth font-sans;
+  }
+  .cn-scroll-area-viewport {
+    scroll-behavior: smooth;
   }
 }
 

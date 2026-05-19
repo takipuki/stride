@@ -16,17 +16,9 @@
   import * as Resizable from '$lib/components/ui/resizable/index.js';
 
   let label = $state('personal');
-
-  //  let { data } = $props();
-
-  //  const studentId = data.student_id;
-
-  //  console.log(studentId);
 </script>
 
 <div class="page-wrapper">
-  <!-- <h1>Student ID: {studentId}</h1> -->
-
   <Resizable.PaneGroup direction="horizontal" class="h-full w-full rounded-lg border">
     <Resizable.Pane defaultSize={50}>
       <div class="flex h-full items-center justify-center p-6">

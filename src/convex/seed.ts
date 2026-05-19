@@ -21,6 +21,8 @@ const TABLES = [
   'tags',
   'postTags',
   'comments',
+  'postVotes',
+  'commentVotes',
 ] as const;
 
 const DEFAULT_PASS = 'pass';
@@ -50,19 +52,22 @@ const USERS = [
 const SECTIONS = [
   {
     name: 'CSE 1111: Structured Programming Language',
-    aboutMd: 'Introduction to C programming, loops, arrays, and pointers.',
+    aboutMd:
+      '<p>Master the fundamentals of <strong>structured programming</strong>. Learn control flow structures, conditional branches, multi-dimensional array manipulation, pointer arithmetic, and recursive function designs in standard C.</p>',
     teacherIndices: [2], // Asnuva
     studentIndices: [3, 4, 5],
   },
   {
     name: 'CSE 1115: Object Oriented Programming',
-    aboutMd: 'Deep dive into Java, inheritance, and polymorphism.',
+    aboutMd:
+      '<p>An intensive deep dive into <em>Object-Oriented Programming (OOP)</em> paradigms. Key modules cover polymorphism, abstract interfaces, custom generics, advanced multi-threading, and robust exception recovery.</p>',
     teacherIndices: [1], // Sidratul
     studentIndices: [3, 4, 6],
   },
   {
     name: 'CSE 2215: Data Structure and Algorithms I',
-    aboutMd: 'Linked lists, trees, and basic searching/sorting.',
+    aboutMd:
+      '<p>Analyze linear and non-linear memory structures. Students implement self-balancing search trees, stack implementations, heap management, sorting complexity, and topological graph traversals.</p>',
     teacherIndices: [2], // Asnuva
     studentIndices: [3, 5, 7],
   },
@@ -321,7 +326,9 @@ export default internalMutation({
 
     const post1 = await ctx.db.insert('posts', {
       authorId: rhasan,
+      title: 'Recursion limits in Python',
       contentMd: 'Is it okay to use recursion for the factorial problem? Will it hit stack limits?',
+      score: 1,
       createdAt: NOW - 2 * ONE_HOUR,
       updatedAt: NOW - 2 * ONE_HOUR,
     });

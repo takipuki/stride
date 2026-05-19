@@ -2,6 +2,13 @@ import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 
 export default defineSchema({
+  signals: defineTable({
+    from: v.string(), // studentId
+    to: v.string(), // "teacher" or studentId
+    type: v.string(), // "offer" | "answer" | "ice"
+    data: v.string(), // JSON stringified
+  }).index('by_to', ['to']),
+
   users: defineTable({
     name: v.string(),
     email: v.string(),
@@ -120,7 +127,10 @@ export default defineSchema({
 
   posts: defineTable({
     authorId: v.id('users'),
+    title: v.string(),
     contentMd: v.string(),
+    storageId: v.optional(v.id('_storage')),
+    score: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index('by_author', ['authorId']),
@@ -141,9 +151,46 @@ export default defineSchema({
     postId: v.id('posts'),
     parentCommentId: v.optional(v.id('comments')),
     content: v.string(),
+    score: v.optional(v.number()),
+    isDeleted: v.optional(v.boolean()),
+    deletedBy: v.optional(v.union(v.literal('user'), v.literal('moderator'))),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index('by_post', ['postId'])
-    .index('by_parent', ['parentCommentId']),
+    .index('by_parent', ['parentCommentId'])
+    .index('by_author', ['authorId']),
+
+  postVotes: defineTable({
+    postId: v.id('posts'),
+    userId: v.id('users'),
+    value: v.union(v.literal(1), v.literal(-1)),
+  })
+    .index('by_post', ['postId'])
+    .index('by_user', ['userId'])
+    .index('by_post_and_user', ['postId', 'userId']),
+
+  commentVotes: defineTable({
+    commentId: v.id('comments'),
+    userId: v.id('users'),
+    value: v.union(v.literal(1), v.literal(-1)),
+  })
+    .index('by_comment', ['commentId'])
+    .index('by_user', ['userId'])
+    .index('by_comment_and_user', ['commentId', 'userId']),
+
+  uploadedImages: defineTable({
+    storageId: v.id('_storage'),
+    authorId: v.id('users'),
+    postId: v.optional(v.id('posts')),
+    commentId: v.optional(v.id('comments')),
+    aboutUserId: v.optional(v.id('users')),
+    isAvatar: v.optional(v.boolean()),
+    createdAt: v.number(),
+  })
+    .index('by_post', ['postId'])
+    .index('by_comment', ['commentId'])
+    .index('by_aboutUserId', ['aboutUserId'])
+    .index('by_storage', ['storageId'])
+    .index('by_author', ['authorId']),
 });

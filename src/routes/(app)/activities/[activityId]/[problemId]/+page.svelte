@@ -6,7 +6,7 @@
   import { api } from '$convex/_generated/api.js';
   import type { Id } from '$convex/_generated/dataModel';
 
-  import Tiptap from '$lib/components/editor/Tiptap.svelte';
+  import Codemirror from '$lib/components/editor/Codemirror.svelte';
   import LanguageSelect from '$lib/components/language-select.svelte';
   import ProblemContent from '$lib/components/problem-content.svelte';
   import SubmissionResultView from '$lib/components/submission-result-view.svelte';
@@ -25,7 +25,7 @@
   let sourceCode = $state('');
   let stdinData = $state('');
   let selectedLanguageId = $state<string | undefined>(undefined);
-  let tiptapLanguage = $derived(getLanguageName(selectedLanguageId));
+  let codemirrorLanguage = $derived(getLanguageName(selectedLanguageId));
 
   let isExecuting = $state(false);
   let result = $state<SubmissionResult | null>(null);
@@ -80,7 +80,7 @@
 <div class="flex h-full w-full flex-1">
   <Resizable.PaneGroup direction="horizontal" class="h-full w-full rounded-lg border">
     <Resizable.Pane defaultSize={50} minSize={20}>
-      <Tiptap language={tiptapLanguage} onUpdate={(text: string) => (sourceCode = text)} />
+      <Codemirror language={codemirrorLanguage} onUpdate={(text: string) => (sourceCode = text)} />
     </Resizable.Pane>
 
     <Resizable.Handle />
