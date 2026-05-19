@@ -1,249 +1,330 @@
 <script lang="ts">
-  import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-  import BookOpen from '@lucide/svelte/icons/book-open';
-  import Calendar from '@lucide/svelte/icons/calendar';
-  import ChevronRight from '@lucide/svelte/icons/chevron-right';
-  import Clock from '@lucide/svelte/icons/clock';
-  import Code from '@lucide/svelte/icons/code';
-  import Play from '@lucide/svelte/icons/play';
+  import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
+  import AwardIcon from '@lucide/svelte/icons/award';
+  import BookOpenIcon from '@lucide/svelte/icons/book-open';
+  import DownloadIcon from '@lucide/svelte/icons/download';
+  import PlayIcon from '@lucide/svelte/icons/play';
+  import UsersIcon from '@lucide/svelte/icons/users';
   import { useQuery } from 'convex-svelte';
+  import { onMount } from 'svelte';
+  import { toast } from 'svelte-sonner';
 
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { api } from '$convex/_generated/api.js';
   import type { Id } from '$convex/_generated/dataModel.js';
 
+  import * as Avatar from '$lib/components/ui/avatar/index.js';
   import { Badge } from '$lib/components/ui/badge/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
   import * as Card from '$lib/components/ui/card/index.js';
   import { Separator } from '$lib/components/ui/separator/index.js';
   import { Skeleton } from '$lib/components/ui/skeleton/index.js';
+  import * as Table from '$lib/components/ui/table/index.js';
   import { session } from '$lib/session';
 
-  const activityId = $derived(page.params.activityId as Id<'activities'>);
-  const userRole = $derived($session?.role);
+  // Role validation
+  onMount(() => {
+    if ($session && $session.role !== 'teacher' && $session.role !== 'admin') {
+      toast.error('Only teachers and admins can view activity status.');
+      goto('/dashboard');
+    }
+  });
 
-  // --- Real-time Convex Queries ---
+  const activityId = $derived(page.params.activityId as Id<'activities'>);
+
+  // Queries
   const activityQuery = useQuery(api.activities.get, () => ({ id: activityId }));
   const problemsQuery = useQuery(api.activities.listProblems, () => ({ activityId }));
+  const submissionsQuery = useQuery(api.submissions.listByActivity, () => ({ activityId }));
 
   const activity = $derived(activityQuery.data);
   const problems = $derived(problemsQuery.data ?? []);
-  const isLoading = $derived(activityQuery.isLoading || problemsQuery.isLoading);
+  const submissions = $derived(submissionsQuery.data ?? []);
 
-  const isActive = $derived.by(() => {
-    if (!activity) return false;
-    const now = Date.now();
-    return now >= activity.startTime && now <= activity.endTime;
-  });
+  const studentsQuery = useQuery(api.sections.listStudents, () =>
+    activity ? { sectionId: activity.sectionId } : 'skip',
+  );
+  const students = $derived(
+    (studentsQuery.data ?? [])
+      .filter((s): s is NonNullable<typeof s> => s !== null)
+      .sort((a, b) => a.name.localeCompare(b.name)),
+  );
 
-  const isUpcoming = $derived.by(() => {
-    if (!activity) return false;
-    return Date.now() < activity.startTime;
-  });
+  const isLoading = $derived(
+    activityQuery.isLoading || problemsQuery.isLoading || submissionsQuery.isLoading || studentsQuery.isLoading,
+  );
 
-  const isCompleted = $derived.by(() => {
-    if (!activity) return false;
-    return Date.now() > activity.endTime;
-  });
-
-  function formatDate(timestamp: number) {
-    return new Date(timestamp).toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+  // Helper to find best submission per student per problem
+  function getBestSubmission(studentId: Id<'users'>, problemId: Id<'problems'>) {
+    const studentSubs = submissions.filter((s) => s.authorId === studentId && s.problemId === problemId);
+    if (studentSubs.length === 0) return null;
+    const accepted = studentSubs.find((s) => s.judgeVerdict === 'Accepted');
+    if (accepted) return accepted;
+    return studentSubs.sort((a, b) => b.submittedAt - a.submittedAt)[0];
   }
 
-  function formatTime(timestamp: number) {
-    return new Date(timestamp).toLocaleTimeString(undefined, {
-      hour: '2-digit',
-      minute: '2-digit',
+  // Solved problems count per student (verdict === 'Accepted')
+  function getSolvedCount(studentId: Id<'users'>): number {
+    return problems.reduce((acc, ap) => {
+      if (!ap.problem) return acc;
+      const sub = getBestSubmission(studentId, ap.problem._id);
+      return sub?.judgeVerdict === 'Accepted' ? acc + 1 : acc;
+    }, 0);
+  }
+
+  // Solved percentage for the whole section
+  const sectionSolvedAverage = $derived.by(() => {
+    if (students.length === 0 || problems.length === 0) return 0;
+    const totalPossible = students.length * problems.length;
+    let totalSolved = 0;
+    for (const student of students) {
+      totalSolved += getSolvedCount(student._id);
+    }
+    return Math.round((totalSolved / totalPossible) * 100);
+  });
+
+  // Participation count (students who made at least one submission)
+  const participationCount = $derived.by(() => {
+    const uniqueSubmitters = new Set(submissions.map((s) => s.authorId));
+    return uniqueSubmitters.size;
+  });
+
+  // CSV Export Action
+  function handleExportCSV() {
+    if (students.length === 0) {
+      toast.error('No student data to export.');
+      return;
+    }
+
+    const headers = [
+      'Student Name',
+      'Email',
+      ...problems.map((ap) => ap.problem?.title ?? 'Unknown Problem'),
+      'Solved Problems',
+      'Total Problems',
+    ];
+
+    const rows = students.map((student) => {
+      const line = [
+        student.name,
+        student.email,
+        ...problems.map((ap) => {
+          if (!ap.problem) return 'N/A';
+          const sub = getBestSubmission(student._id, ap.problem._id);
+          return sub ? (sub.judgeVerdict ?? 'Submitted') : 'No Submission';
+        }),
+        getSolvedCount(student._id),
+        problems.length,
+      ];
+      return line.map((val) => `"${val.toString().replace(/"/g, '""')}"`).join(',');
     });
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${activity?.title ?? 'Activity'}_Status.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Status scoreboard exported as CSV successfully!');
   }
 </script>
 
-<div class="mx-auto flex w-full max-w-4xl flex-col gap-6 p-6 md:p-8">
-  <!-- Back Action -->
-  <div>
-    {#if activity}
-      <Button
-        href="/sections/{activity.sectionId}"
-        variant="ghost"
-        class="h-8 gap-1.5 pl-2 text-xs font-semibold text-muted-foreground hover:bg-muted"
-      >
-        <ArrowLeft class="h-3.5 w-3.5" />
-        Back to Section Hub
+<div class="flex flex-col gap-6 p-6">
+  <!-- Header -->
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-4">
+      {#if activity}
+        <Button variant="outline" size="icon" onclick={() => goto(`/sections/${activity.sectionId}`)}>
+          <ArrowLeftIcon class="size-4" />
+        </Button>
+      {:else}
+        <Skeleton class="size-10" />
+      {/if}
+      <div class="flex flex-col">
+        <h1 class="text-2xl font-bold tracking-tight">
+          {#if activity}
+            Status: {activity.title}
+          {:else}
+            <Skeleton class="h-8 w-48" />
+          {/if}
+        </h1>
+        <p class="text-sm text-muted-foreground">Classroom status matrix and student submissions.</p>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-2">
+      {#if activity}
+        <Button variant="outline" onclick={() => goto(`/activities/${activityId}/playback`)}>
+          <PlayIcon class="mr-2 size-4" />
+          Code Playback
+        </Button>
+      {/if}
+      <Button onclick={handleExportCSV} disabled={isLoading || students.length === 0}>
+        <DownloadIcon class="mr-2 size-4" />
+        Export CSV
       </Button>
-    {:else}
-      <Button
-        href="/sections"
-        variant="ghost"
-        class="h-8 gap-1.5 pl-2 text-xs font-semibold text-muted-foreground hover:bg-muted"
-      >
-        <ArrowLeft class="h-3.5 w-3.5" />
-        Back to Sections
-      </Button>
-    {/if}
+    </div>
   </div>
 
-  {#if isLoading}
-    <div class="flex flex-col gap-6">
-      <Card.Root class="overflow-hidden border border-border bg-card">
-        <Card.Header class="gap-2">
-          <Skeleton class="h-8 w-1/3" />
-          <Skeleton class="h-4 w-1/2" />
-        </Card.Header>
-        <Card.Content class="gap-4">
-          <Skeleton class="h-20 w-full" />
-        </Card.Content>
-      </Card.Root>
-    </div>
-  {:else if !activity}
-    <Card.Root class="border-border bg-card p-8 text-center shadow-xs">
-      <Card.Header>
-        <Card.Title class="text-md font-bold text-foreground">Activity Not Found</Card.Title>
-        <Card.Description class="text-xs text-muted-foreground"
-          >The requested activity or exam could not be loaded.</Card.Description
-        >
+  <!-- Summary Cards -->
+  <div class="grid gap-6 md:grid-cols-3">
+    <Card.Root>
+      <Card.Header class="flex flex-row items-center justify-between pb-2">
+        <Card.Title class="text-sm font-medium">Students Enrolled</Card.Title>
+        <UsersIcon class="size-4 text-muted-foreground" />
       </Card.Header>
-      <Card.Content class="pt-4">
-        <Button href="/sections" variant="outline" class="border-border text-xs font-semibold">
-          Return to Sections
-        </Button>
+      <Card.Content>
+        {#if isLoading}
+          <Skeleton class="h-8 w-16" />
+        {:else}
+          <div class="text-2xl font-bold">{students.length}</div>
+          <p class="text-xs text-muted-foreground">Active members in this section.</p>
+        {/if}
       </Card.Content>
     </Card.Root>
-  {:else}
-    <!-- Activity Status Banner / Header -->
-    <div class="flex flex-col justify-between gap-4 border-b border-border/40 pb-6 md:flex-row md:items-center">
-      <div class="space-y-2">
-        <div class="flex items-center gap-2.5">
-          <div class="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <Calendar class="size-4.5" />
-          </div>
-          <div>
-            <h1 class="text-2xl font-bold tracking-tight text-foreground">{activity.title}</h1>
-            <p class="text-xs text-muted-foreground">Course activity inside this section.</p>
-          </div>
-        </div>
-      </div>
 
-      <div class="flex flex-wrap items-center gap-2">
-        <Badge
-          variant="outline"
-          class="border-border bg-muted/30 px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase"
-        >
-          {activity.type}
-        </Badge>
-      </div>
-    </div>
+    <Card.Root>
+      <Card.Header class="flex flex-row items-center justify-between pb-2">
+        <Card.Title class="text-sm font-medium">Class Participation</Card.Title>
+        <BookOpenIcon class="size-4 text-muted-foreground" />
+      </Card.Header>
+      <Card.Content>
+        {#if isLoading}
+          <Skeleton class="h-8 w-16" />
+        {:else}
+          <div class="text-2xl font-bold">{participationCount} / {students.length}</div>
+          <p class="text-xs text-muted-foreground">Students who submitted code.</p>
+        {/if}
+      </Card.Content>
+    </Card.Root>
 
-    <div class="grid gap-6 md:grid-cols-3">
-      <!-- Main Activity Area -->
-      <div class="space-y-6 md:col-span-2">
-        <!-- Problems Card -->
-        <Card.Root class="border border-border bg-card shadow-xs">
-          <Card.Header class="flex flex-row items-center justify-between pb-3">
-            <Card.Title class="text-sm font-bold tracking-wider text-muted-foreground uppercase"
-              >Problem List</Card.Title
-            >
-            <Badge variant="outline" class="border-border bg-muted/30 px-2 py-0.5 text-xs font-bold">
-              {problems.length} Problem(s)
-            </Badge>
-          </Card.Header>
-          <Separator />
-          <Card.Content class="p-0">
-            {#if problems.length === 0}
-              <div class="p-6 text-center text-xs text-muted-foreground italic">
-                No problems have been assigned to this activity yet.
-              </div>
-            {:else}
-              <div class="divide-y divide-border/30">
-                {#each problems as ap, i (ap._id)}
-                  {#if ap.problem}
-                    <div class="flex items-center justify-between p-4 transition-colors hover:bg-muted/10">
-                      <div class="flex items-center gap-3">
-                        <div
-                          class="flex size-7 shrink-0 items-center justify-center rounded-full border border-border bg-muted/40 text-xs font-bold"
-                        >
-                          {ap.problemOrder + 1}
-                        </div>
-                        <div>
-                          <h4 class="text-xs font-bold text-foreground">{ap.problem.title}</h4>
-                          {#if ap.problem.contentMd}
-                            <p class="mt-0.5 line-clamp-1 text-[10px] text-muted-foreground">
-                              {ap.problem.contentMd.replace(/<[^>]*>/g, '').substring(0, 80)}
-                            </p>
-                          {/if}
-                        </div>
-                      </div>
+    <Card.Root>
+      <Card.Header class="flex flex-row items-center justify-between pb-2">
+        <Card.Title class="text-sm font-medium">Section Success Rate</Card.Title>
+        <AwardIcon class="size-4 text-muted-foreground" />
+      </Card.Header>
+      <Card.Content>
+        {#if isLoading}
+          <Skeleton class="h-8 w-16" />
+        {:else}
+          <div class="text-2xl font-bold">{sectionSolvedAverage}%</div>
+          <p class="text-xs text-muted-foreground">Percentage of total problems solved.</p>
+        {/if}
+      </Card.Content>
+    </Card.Root>
+  </div>
 
-                      <div>
-                        {#if userRole === 'teacher'}
-                          <!-- Teachers can enter directly to review or solve -->
-                          <Button
-                            href="/activities/{activityId}/{ap.problem._id}"
-                            size="sm"
-                            class="h-7 bg-primary px-2.5 text-[10px] font-bold text-primary-foreground hover:bg-primary/90"
-                          >
-                            Enter Workspace
-                          </Button>
-                        {:else if userRole === 'admin'}
-                          <!-- Admins can go and view the problems and content -->
-                          <Button
-                            href="/activities/{activityId}/{ap.problem._id}"
-                            size="sm"
-                            class="h-7 bg-primary px-2.5 text-[10px] font-bold text-primary-foreground hover:bg-primary/90"
-                          >
-                            View Content
-                          </Button>
-                        {:else}
-                          <!-- Read-only view -->
-                          <Badge variant="outline" class="border-border bg-muted/30 text-[10px] text-muted-foreground">
-                            Closed
-                          </Badge>
-                        {/if}
+  <!-- Scoreboard Matrix -->
+  <Card.Root>
+    <Card.Header>
+      <Card.Title>Status Matrix</Card.Title>
+      <Card.Description>Click on any student verdict badge to inspect their playback history.</Card.Description>
+    </Card.Header>
+    <Separator />
+    <Card.Content class="p-0">
+      <div class="overflow-x-auto">
+        <Table.Root class="w-full min-w-[700px]">
+          <Table.Header>
+            <Table.Row>
+              <Table.Head class="w-[200px]">Student</Table.Head>
+              {#each problems as ap, idx (ap._id)}
+                <Table.Head class="max-w-[150px] truncate text-center text-xs font-semibold" title={ap.problem?.title}>
+                  P{idx + 1}: {ap.problem?.title}
+                </Table.Head>
+              {/each}
+              <Table.Head class="w-[120px] text-right">Solved</Table.Head>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {#if isLoading}
+              {#each [0, 1, 2, 3] as i (i)}
+                <Table.Row>
+                  <Table.Cell>
+                    <div class="flex items-center gap-2">
+                      <Skeleton class="size-8 rounded-full" />
+                      <div class="flex flex-col gap-1">
+                        <Skeleton class="h-4 w-24" />
+                        <Skeleton class="h-3 w-32" />
                       </div>
                     </div>
-                  {/if}
-                {/each}
-              </div>
+                  </Table.Cell>
+                  {#each problems as ap (ap._id)}
+                    <Table.Cell class="text-center">
+                      <Skeleton class="mx-auto h-6 w-16" />
+                    </Table.Cell>
+                  {/each}
+                  <Table.Cell class="text-right">
+                    <Skeleton class="ml-auto h-4 w-8" />
+                  </Table.Cell>
+                </Table.Row>
+              {/each}
+            {:else if students.length === 0}
+              <Table.Row>
+                <Table.Cell colspan={problems.length + 2} class="h-24 text-center text-sm text-muted-foreground">
+                  No students enrolled in this section.
+                </Table.Cell>
+              </Table.Row>
+            {:else}
+              {#each students as student (student._id)}
+                <Table.Row>
+                  <!-- Student Avatar & Name -->
+                  <Table.Cell>
+                    <div class="flex items-center gap-3">
+                      <Avatar.Root class="size-8">
+                        <Avatar.Image src={student.avatarUrl} alt={student.name} />
+                        <Avatar.Fallback class="text-xs">{student.name.slice(0, 2).toUpperCase()}</Avatar.Fallback>
+                      </Avatar.Root>
+                      <div class="flex min-w-0 flex-col">
+                        <span class="truncate text-sm font-medium">{student.name}</span>
+                        <span class="truncate text-xs text-muted-foreground">{student.email}</span>
+                      </div>
+                    </div>
+                  </Table.Cell>
+
+                  <!-- Problem Cells -->
+                  {#each problems as ap (ap._id)}
+                    {@const problemId = ap.problemId}
+                    {@const sub = getBestSubmission(student._id, problemId)}
+                    <Table.Cell class="text-center">
+                      {#if sub}
+                        {@const isAccepted = sub.judgeVerdict === 'Accepted'}
+                        <a
+                          href="/activities/${activityId}/playback/${problemId}/${student._id}"
+                          class="inline-block transition-transform hover:scale-105"
+                        >
+                          <Badge
+                            variant={isAccepted ? 'default' : 'destructive'}
+                            class="cursor-pointer text-xs {isAccepted
+                              ? 'bg-green-600 text-white hover:bg-green-700'
+                              : ''}"
+                          >
+                            {sub.judgeVerdict ?? 'Submitted'}
+                          </Badge>
+                        </a>
+                      {:else}
+                        <span class="text-xs text-muted-foreground/50">—</span>
+                      {/if}
+                    </Table.Cell>
+                  {/each}
+
+                  <!-- Summary Cell -->
+                  <Table.Cell class="text-right font-medium">
+                    <Badge variant="outline" class="font-semibold tabular-nums">
+                      {getSolvedCount(student._id)} / {problems.length}
+                    </Badge>
+                  </Table.Cell>
+                </Table.Row>
+              {/each}
             {/if}
-          </Card.Content>
-        </Card.Root>
+          </Table.Body>
+        </Table.Root>
       </div>
-
-      <!-- Schedule / Details Area -->
-      <div class="space-y-6">
-        <!-- Details Card -->
-        <Card.Root class="border-border bg-card shadow-xs">
-          <Card.Header class="pb-3">
-            <Card.Title class="text-sm font-bold tracking-wider text-muted-foreground uppercase"
-              >Schedule Details</Card.Title
-            >
-          </Card.Header>
-          <Card.Content class="space-y-4 text-xs">
-            <div class="flex items-start gap-2.5">
-              <Clock class="mt-0.5 h-4 w-4 text-muted-foreground" />
-              <div class="space-y-1">
-                <span class="font-semibold text-muted-foreground">Start Time</span>
-                <p class="font-bold text-foreground">
-                  {formatDate(activity.startTime)} at {formatTime(activity.startTime)}
-                </p>
-              </div>
-            </div>
-
-            <div class="flex items-start gap-2.5 border-t border-border/30 pt-3">
-              <Clock class="mt-0.5 h-4 w-4 text-muted-foreground" />
-              <div class="space-y-1">
-                <span class="font-semibold text-muted-foreground">End Time</span>
-                <p class="font-bold text-foreground">
-                  {formatDate(activity.endTime)} at {formatTime(activity.endTime)}
-                </p>
-              </div>
-            </div>
-          </Card.Content>
-        </Card.Root>
-      </div>
-    </div>
-  {/if}
+    </Card.Content>
+  </Card.Root>
 </div>

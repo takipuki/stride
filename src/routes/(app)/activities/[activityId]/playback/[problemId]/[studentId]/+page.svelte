@@ -149,7 +149,7 @@
   // ─── Test case management ─────────────────────────────────────────────────
   let selectedLanguageId = $state<string | undefined>(undefined);
   let isExecuting = $state(false);
-  let results = $state(new SvelteMap<string, SubmissionResult>());
+  let results = new SvelteMap<string, SubmissionResult>();
 
   // Auto-run tests with last snapshot when ready
   $effect(() => {

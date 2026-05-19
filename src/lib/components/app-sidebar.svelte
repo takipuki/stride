@@ -1,5 +1,6 @@
 <script lang="ts">
   import BookOpenIcon from '@lucide/svelte/icons/book-open';
+  import CalendarIcon from '@lucide/svelte/icons/calendar';
   import GaugeIcon from '@lucide/svelte/icons/gauge';
   import LayersIcon from '@lucide/svelte/icons/layers';
   import MessageSquareIcon from '@lucide/svelte/icons/message-square';
@@ -28,6 +29,7 @@
   const platformItems = $derived([
     { title: 'Dashboard', url: '/dashboard', icon: GaugeIcon },
     { title: 'Sections', url: '/sections', icon: LayersIcon },
+    { title: 'Activities', url: '/activities', icon: CalendarIcon },
     // Problems only for teacher/admin
     ...(currentSession?.role === 'teacher' || currentSession?.role === 'admin'
       ? [{ title: 'Problems', url: '/problems', icon: BookOpenIcon }]
