@@ -10,6 +10,7 @@
   import UsersIcon from '@lucide/svelte/icons/users';
   import { useConvexClient, useQuery } from 'convex-svelte';
   import SimplePeer from 'simple-peer/simplepeer.min.js';
+  import { untrack } from 'svelte';
   import { SvelteSet } from 'svelte/reactivity';
 
   import { page } from '$app/state';
@@ -49,11 +50,59 @@
   // Track processed signal IDs to prevent duplicate WebRTC negotiations
   const processedIds = new SvelteSet<string>();
 
+  // Custom student list sorting and highlighting
+  let customStudentOrder = $state<Id<'users'>[]>([]);
+  let highlightedStudents = $state<Record<string, boolean>>({});
+  const highlightTimers: Record<string, any> = {};
+
+  $effect(() => {
+    const data = studentsQuery.data;
+    if (data) {
+      const newIds = data.filter((s): s is NonNullable<typeof s> => s !== null).map((s) => s._id);
+      untrack(() => {
+        const filteredExisting = customStudentOrder.filter((id) => newIds.includes(id));
+        const added = newIds.filter((id) => !filteredExisting.includes(id));
+        customStudentOrder = [...filteredExisting, ...added];
+      });
+    }
+  });
+
+  function handleStudentTabSwitch(studentId: Id<'users'>) {
+    console.log(`P2P Alert: Student ${studentId} switched tab or application!`);
+
+    // Check if the student is already in the first page
+    const isAlreadyOnFirstPage = studentsList.slice(0, itemsPerPage).some((s) => s._id === studentId);
+
+    if (!isAlreadyOnFirstPage) {
+      // Move student to the top of the custom list
+      const updatedOrder = customStudentOrder.filter((id) => id !== studentId);
+      customStudentOrder = [studentId, ...updatedOrder];
+    }
+
+    // Always reset to first page so teacher sees the change/highlight
+    currentPage = 1;
+
+    // Trigger visual highlight
+    highlightedStudents[studentId] = true;
+
+    // Reset timer
+    if (highlightTimers[studentId]) {
+      clearTimeout(highlightTimers[studentId]);
+    }
+    highlightTimers[studentId] = setTimeout(() => {
+      highlightedStudents[studentId] = false;
+    }, 5000);
+  }
+
   // Pagination State
   let currentPage = $state(1);
   const itemsPerPage = 6; // Elegant 2x3 grid layout (6 items per page)
 
-  const studentsList = $derived((studentsQuery.data ?? []).filter((s): s is NonNullable<typeof s> => s !== null));
+  const studentsList = $derived(
+    customStudentOrder
+      .map((id) => (studentsQuery.data ?? []).find((s) => s?._id === id))
+      .filter((s): s is NonNullable<typeof s> => s !== undefined && s !== null),
+  );
   const totalStudents = $derived(studentsList.length);
   const totalPages = $derived(Math.max(1, Math.ceil(totalStudents / itemsPerPage)));
 
@@ -141,6 +190,26 @@
           }
         });
 
+        // Handle incoming data channel messages (P2P tab switch alerts)
+        peerInstance.on('data', (rawVal) => {
+          try {
+            let str = '';
+            if (typeof rawVal === 'string') {
+              str = rawVal;
+            } else if (rawVal instanceof Uint8Array || rawVal instanceof ArrayBuffer) {
+              str = new TextDecoder('utf-8').decode(rawVal);
+            } else {
+              str = new TextDecoder('utf-8').decode(new Uint8Array(rawVal));
+            }
+            const msg = JSON.parse(str);
+            if (msg.type === 'tab-switch') {
+              handleStudentTabSwitch(studentId as Id<'users'>);
+            }
+          } catch (err) {
+            console.error(`Failed to parse P2P data from student ${studentId}:`, err);
+          }
+        });
+
         // Handle error and disconnects
         peerInstance.on('error', (err) => {
           console.error(`WebRTC error for student ${studentId}:`, err);
@@ -185,6 +254,11 @@
       if (fullscreenStudentId === studentId) {
         fullscreenStudentId = null;
       }
+      if (highlightTimers[studentId]) {
+        clearTimeout(highlightTimers[studentId]);
+        delete highlightTimers[studentId];
+      }
+      delete highlightedStudents[studentId];
     }
   }
 
@@ -214,6 +288,7 @@
       Object.keys(activeStreams).forEach((studentId) => {
         cleanupStudent(studentId);
       });
+      Object.values(highlightTimers).forEach((timer) => clearTimeout(timer));
     };
   });
 </script>
@@ -286,7 +361,11 @@
         {@const isLive = connection && connection.status === 'connected' && connection.stream}
 
         <div
-          class="group relative flex h-fit flex-col overflow-hidden rounded-2xl border border-border/40 bg-card/45 shadow-xl backdrop-blur-md"
+          class="group relative flex h-fit flex-col overflow-hidden rounded-2xl border bg-card/45 shadow-xl backdrop-blur-md transition-all duration-500 {highlightedStudents[
+            student._id
+          ]
+            ? 'scale-[1.02] animate-pulse border-destructive ring-2 shadow-destructive/20 ring-destructive ring-offset-2 ring-offset-background'
+            : 'border-border/40'}"
         >
           <!-- Card Header details -->
           <div class="flex items-center justify-between border-b border-border/40 bg-background/20 px-4 py-3">
@@ -305,11 +384,19 @@
 
             <!-- Status Indicator Badge -->
             {#if isLive}
-              <span
-                class="flex animate-pulse items-center gap-1 rounded border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold tracking-wider text-emerald-400 uppercase"
-              >
-                Live
-              </span>
+              {#if highlightedStudents[student._id]}
+                <span
+                  class="flex animate-bounce items-center gap-1 rounded border border-destructive/20 bg-destructive/10 px-2 py-0.5 text-[9px] font-bold tracking-wider text-destructive uppercase"
+                >
+                  Unfocused
+                </span>
+              {:else}
+                <span
+                  class="flex animate-pulse items-center gap-1 rounded border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold tracking-wider text-emerald-400 uppercase"
+                >
+                  Live
+                </span>
+              {/if}
             {:else if connection && connection.status === 'connecting'}
               <span
                 class="flex animate-pulse items-center gap-1 rounded border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[9px] font-bold tracking-wider text-amber-400 uppercase"
