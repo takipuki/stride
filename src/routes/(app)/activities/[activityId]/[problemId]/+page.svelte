@@ -11,12 +11,15 @@
   import ProblemContent from '$lib/components/problem-content.svelte';
   import SubmissionResultView from '$lib/components/submission-result-view.svelte';
   import { Button } from '$lib/components/ui/button/index.js';
+  import * as Card from '$lib/components/ui/card/index.js';
   import * as Resizable from '$lib/components/ui/resizable/index.js';
   import { Spinner } from '$lib/components/ui/spinner/index.js';
   import { Textarea } from '$lib/components/ui/textarea/index.js';
   import { getLanguageName } from '$lib/judge0-utils';
   import type { SubmissionResult } from '$lib/server/judge0';
   import { session } from '$lib/session';
+
+  const userRole = $derived($session?.role);
 
   const problemQuery = useQuery(api.problems.get, () =>
     page.params.problemId ? { id: page.params.problemId as Id<'problems'> } : 'skip',
@@ -60,6 +63,7 @@
   let lastSourceCode = '';
   const client = useConvexClient();
   function snapshotSave() {
+    if (userRole === 'admin') return;
     if (!$session?.userId) return;
     if (!page.params.problemId || !page.params.activityId) return;
     if (sourceCode !== lastSourceCode) {
@@ -80,7 +84,11 @@
 <div class="flex h-full w-full flex-1">
   <Resizable.PaneGroup direction="horizontal" class="h-full w-full rounded-lg border">
     <Resizable.Pane defaultSize={50} minSize={20}>
-      <Codemirror language={codemirrorLanguage} onUpdate={(text: string) => (sourceCode = text)} />
+      <Codemirror
+        language={codemirrorLanguage}
+        onUpdate={(text: string) => (sourceCode = text)}
+        editable={userRole !== 'admin'}
+      />
     </Resizable.Pane>
 
     <Resizable.Handle />
@@ -100,44 +108,54 @@
         <Resizable.Handle />
 
         <Resizable.Pane defaultSize={30} minSize={15}>
-          <Resizable.PaneGroup direction="horizontal" class="h-full w-full border-t">
-            <Resizable.Pane defaultSize={50} minSize={20}>
-              <div class="flex h-full flex-col gap-2 p-4">
-                <div class="flex items-center gap-2">
-                  <LanguageSelect bind:value={selectedLanguageId} disabled={isExecuting} />
-                  <Button size="sm" onclick={executeCode} disabled={isExecuting || !selectedLanguageId}>
-                    {#if isExecuting}
-                      <Spinner class="mr-2 h-4 w-4" />
-                      Executing...
-                    {:else}
-                      Execute
-                    {/if}
-                  </Button>
-                </div>
-                <Textarea
-                  class="flex-1 resize-none font-mono text-sm"
-                  placeholder="Standard Input (stdin)"
-                  bind:value={stdinData}
-                />
-              </div>
-            </Resizable.Pane>
-
-            <Resizable.Handle />
-
-            <Resizable.Pane defaultSize={50} minSize={20}>
-              <div class="flex h-full w-full flex-col overflow-hidden p-4">
-                {#if !result}
-                  <div
-                    class="flex h-full items-center justify-center rounded-md bg-muted/30 font-mono text-sm text-muted-foreground"
-                  >
-                    Run code to see output...
+          {#if userRole === 'admin'}
+            <div class="flex h-full w-full flex-col items-center justify-center border-t bg-muted/10 p-6 text-center">
+              <span class="text-xs font-semibold text-muted-foreground">Admin View Only Mode</span>
+              <p class="mt-1 max-w-sm text-[10px] leading-relaxed text-muted-foreground/75">
+                You are viewing this activity's problem description in read-only mode. Code editing, sandbox execution,
+                and snapshot saves are disabled.
+              </p>
+            </div>
+          {:else}
+            <Resizable.PaneGroup direction="horizontal" class="h-full w-full border-t">
+              <Resizable.Pane defaultSize={50} minSize={20}>
+                <div class="flex h-full flex-col gap-2 p-4">
+                  <div class="flex items-center gap-2">
+                    <LanguageSelect bind:value={selectedLanguageId} disabled={isExecuting} />
+                    <Button size="sm" onclick={executeCode} disabled={isExecuting || !selectedLanguageId}>
+                      {#if isExecuting}
+                        <Spinner class="mr-2 h-4 w-4" />
+                        Executing...
+                      {:else}
+                        Execute
+                      {/if}
+                    </Button>
                   </div>
-                {:else}
-                  <SubmissionResultView {result} showTabs={true} />
-                {/if}
-              </div>
-            </Resizable.Pane>
-          </Resizable.PaneGroup>
+                  <Textarea
+                    class="flex-1 resize-none font-mono text-sm"
+                    placeholder="Standard Input (stdin)"
+                    bind:value={stdinData}
+                  />
+                </div>
+              </Resizable.Pane>
+
+              <Resizable.Handle />
+
+              <Resizable.Pane defaultSize={50} minSize={20}>
+                <div class="flex h-full w-full flex-col overflow-hidden p-4">
+                  {#if !result}
+                    <div
+                      class="flex h-full items-center justify-center rounded-md bg-muted/30 font-mono text-sm text-muted-foreground"
+                    >
+                      Run code to see output...
+                    </div>
+                  {:else}
+                    <SubmissionResultView {result} showTabs={true} />
+                  {/if}
+                </div>
+              </Resizable.Pane>
+            </Resizable.PaneGroup>
+          {/if}
         </Resizable.Pane>
       </Resizable.PaneGroup>
     </Resizable.Pane>

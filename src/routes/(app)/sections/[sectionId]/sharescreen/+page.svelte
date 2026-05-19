@@ -37,6 +37,7 @@
 
   // Reactive State
   let peer = $state<SimplePeer.Instance | null>(null);
+  let peerConnected = $state(false);
   let stream = $state<MediaStream | null>(null);
   let sharing = $state(false);
   let status = $state<'disconnected' | 'ready' | 'sharing'>('disconnected');
@@ -45,6 +46,42 @@
 
   // Track processed signal IDs to prevent duplicate WebRTC negotiations
   const processedIds = new SvelteSet<string>();
+
+  let lastNotificationTime = 0;
+  function notifyTeacherOfTabSwitch() {
+    if (!sharing || !peer || !peerConnected) return;
+    const now = Date.now();
+    if (now - lastNotificationTime < 3000) return; // throttle 3s
+    lastNotificationTime = now;
+    try {
+      console.log('Sending tab-switch notification to teacher via P2P...');
+      peer.send(JSON.stringify({ type: 'tab-switch' }));
+    } catch (err) {
+      console.error('Failed to send tab-switch notification via P2P:', err);
+    }
+  }
+
+  $effect(() => {
+    if (!sharing || !peerConnected) return;
+
+    function handleVisibilityChange() {
+      if (document.hidden) {
+        notifyTeacherOfTabSwitch();
+      }
+    }
+
+    function handleBlur() {
+      notifyTeacherOfTabSwitch();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleBlur);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleBlur);
+    };
+  });
 
   // Re-creates / starts WebRTC peer connection
   function restartPeerConnection() {
@@ -56,6 +93,7 @@
       }
       peer = null;
     }
+    peerConnected = false;
 
     if (!stream || !studentId) return;
 
@@ -74,11 +112,17 @@
 
     p.on('connect', () => {
       console.log('WebRTC connection established with teacher.');
+      peerConnected = true;
+    });
+
+    p.on('close', () => {
+      peerConnected = false;
     });
 
     p.on('error', (err) => {
       console.error('WebRTC peer error:', err);
       errorMessage = 'WebRTC connection dropped. Retrying...';
+      peerConnected = false;
     });
 
     peer = p;
@@ -160,6 +204,7 @@
   // Stop screen sharing and clean up
   function stopSharing() {
     console.log('Stopping screen sharing...');
+    peerConnected = false;
     if (peer) {
       try {
         peer.destroy();

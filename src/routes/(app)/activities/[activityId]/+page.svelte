@@ -74,7 +74,7 @@
   }
 
   // Solved percentage for the whole section
-  const sectionSolvedAverage = $derived(() => {
+  const sectionSolvedAverage = $derived.by(() => {
     if (students.length === 0 || problems.length === 0) return 0;
     const totalPossible = students.length * problems.length;
     let totalSolved = 0;
@@ -85,7 +85,7 @@
   });
 
   // Participation count (students who made at least one submission)
-  const participationCount = $derived(() => {
+  const participationCount = $derived.by(() => {
     const uniqueSubmitters = new Set(submissions.map((s) => s.authorId));
     return uniqueSubmitters.size;
   });
@@ -198,7 +198,7 @@
         {#if isLoading}
           <Skeleton class="h-8 w-16" />
         {:else}
-          <div class="text-2xl font-bold">{participationCount()} / {students.length}</div>
+          <div class="text-2xl font-bold">{participationCount} / {students.length}</div>
           <p class="text-xs text-muted-foreground">Students who submitted code.</p>
         {/if}
       </Card.Content>
@@ -213,7 +213,7 @@
         {#if isLoading}
           <Skeleton class="h-8 w-16" />
         {:else}
-          <div class="text-2xl font-bold">{sectionSolvedAverage()}%</div>
+          <div class="text-2xl font-bold">{sectionSolvedAverage}%</div>
           <p class="text-xs text-muted-foreground">Percentage of total problems solved.</p>
         {/if}
       </Card.Content>
