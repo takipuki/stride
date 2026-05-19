@@ -1,6 +1,7 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
+import { associateImagesForSection } from './uploadedImages';
 
 export const get = query({
   args: { id: v.id('sections') },
@@ -51,7 +52,11 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now();
-    return await ctx.db.insert('sections', { ...args, createdAt: now, updatedAt: now });
+    const sectionId = await ctx.db.insert('sections', { ...args, createdAt: now, updatedAt: now });
+    if (args.aboutMd) {
+      await associateImagesForSection(ctx, sectionId, args.aboutMd);
+    }
+    return sectionId;
   },
 });
 
@@ -64,12 +69,27 @@ export const update = mutation({
   handler: async (ctx, { id, ...fields }) => {
     const patch = Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined));
     await ctx.db.patch(id, { ...patch, updatedAt: Date.now() });
+    if (fields.aboutMd !== undefined) {
+      await associateImagesForSection(ctx, id, fields.aboutMd);
+    }
   },
 });
 
 export const remove = mutation({
   args: { id: v.id('sections') },
   handler: async (ctx, args) => {
+    const associated = await ctx.db
+      .query('uploadedImages')
+      .withIndex('by_section', (q) => q.eq('sectionId', args.id))
+      .collect();
+    for (const img of associated) {
+      try {
+        await ctx.storage.delete(img.storageId);
+      } catch (e) {
+        console.error('Failed to delete section image from storage on delete:', e);
+      }
+      await ctx.db.delete(img._id);
+    }
     await ctx.db.delete(args.id);
   },
 });

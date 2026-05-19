@@ -15,12 +15,11 @@
 
   import Tiptap from '$lib/components/editor/Tiptap.svelte';
   import * as Avatar from '$lib/components/ui/avatar/index.js';
-  import { Badge } from '$lib/components/ui/badge/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
   import * as Card from '$lib/components/ui/card/index.js';
   import { Input } from '$lib/components/ui/input/index.js';
   import { Label } from '$lib/components/ui/label/index.js';
-  import * as Select from '$lib/components/ui/select/index.js';
+  import { Separator } from '$lib/components/ui/separator/index.js';
   import { Skeleton } from '$lib/components/ui/skeleton/index.js';
   import { session } from '$lib/session';
 
@@ -49,6 +48,8 @@
 
   // --- Search / Filter Lists ---
   let studentSearchQuery = $state('');
+  let teacherSearchQuery = $state('');
+  let studentEnrollSearchQuery = $state('');
   let teacherToAssignId = $state('');
   let studentToEnrollId = $state('');
 
@@ -74,11 +75,20 @@
     students.filter((s) => !sectionStudents.some((enrolled) => enrolled._id === s._id)),
   );
 
-  const selectedTeacherLabel = $derived(
-    availableTeachers.find((t) => t._id === teacherToAssignId)?.name || 'Choose Instructor...',
+  const filteredAvailableTeachers = $derived(
+    availableTeachers.filter(
+      (t) =>
+        t.name.toLowerCase().includes(teacherSearchQuery.toLowerCase()) ||
+        t.email.toLowerCase().includes(teacherSearchQuery.toLowerCase()),
+    ),
   );
-  const selectedStudentLabel = $derived(
-    availableStudents.find((s) => s._id === studentToEnrollId)?.name || 'Select Student...',
+
+  const filteredAvailableStudents = $derived(
+    availableStudents.filter(
+      (s) =>
+        s.name.toLowerCase().includes(studentEnrollSearchQuery.toLowerCase()) ||
+        s.email.toLowerCase().includes(studentEnrollSearchQuery.toLowerCase()),
+    ),
   );
 
   const isLoading = $derived(
@@ -111,8 +121,8 @@
     }
   }
 
-  async function assignTeacher(e: Event) {
-    e.preventDefault();
+  async function assignTeacher(e?: Event) {
+    if (e) e.preventDefault();
     if (!teacherToAssignId) return;
     try {
       await client.mutation(api.sections.addTeacher, {
@@ -140,8 +150,8 @@
     }
   }
 
-  async function enrollStudent(e: Event) {
-    e.preventDefault();
+  async function enrollStudent(e?: Event) {
+    if (e) e.preventDefault();
     if (!studentToEnrollId) return;
     try {
       await client.mutation(api.sections.addStudent, {
@@ -285,99 +295,113 @@
       </form>
 
       <!-- 2. Instructor Assignment Card -->
-      <form onsubmit={assignTeacher}>
-        <Card.Root class="overflow-hidden border border-border bg-card shadow-sm">
-          <Card.Header class="space-y-1.5 border-b bg-muted/10 p-6">
-            <Card.Title class="flex items-center gap-2 text-lg font-bold tracking-tight">
-              <UserCheck class="h-5 w-5 text-primary" />
-              Primary Instructor
-            </Card.Title>
-            <Card.Description class="text-xs text-muted-foreground">
-              Configure the instructor assigned to lead this academic section. Strict one-teacher policy is enforced.
-            </Card.Description>
-          </Card.Header>
+      <Card.Root class="overflow-hidden border border-border bg-card shadow-sm">
+        <Card.Header class="space-y-1.5 border-b bg-muted/10 p-6">
+          <Card.Title class="flex items-center gap-2 text-lg font-bold tracking-tight">
+            <UserCheck class="h-5 w-5 text-primary" />
+            Primary Instructor
+          </Card.Title>
+          <Card.Description class="text-xs text-muted-foreground">
+            Configure the instructor assigned to lead this academic section. Strict one-teacher policy is enforced.
+          </Card.Description>
+        </Card.Header>
 
-          <Card.Content class="flex flex-col gap-6 p-6">
-            <!-- Current Instructor Profile details -->
-            <div class="space-y-3">
-              <Label class="text-xs font-semibold text-muted-foreground">Assigned Faculty Member</Label>
-              {#if sectionTeachers.length === 0}
-                <div
-                  class="rounded-lg border border-dashed border-border bg-muted/10 p-5 text-center text-xs text-muted-foreground italic"
-                >
-                  No primary instructor currently assigned. Choose an instructor below.
-                </div>
-              {:else}
-                <div class="space-y-2">
-                  {#each sectionTeachers as teacher (teacher._id)}
-                    <div
-                      class="flex items-center justify-between rounded-lg border border-border bg-card p-3 shadow-xs"
+        <Card.Content class="flex flex-col gap-6 p-6">
+          <!-- Current Instructor Profile details -->
+          <div class="space-y-3">
+            <Label class="text-xs font-semibold text-muted-foreground">Assigned Faculty Member</Label>
+            {#if sectionTeachers.length === 0}
+              <div
+                class="rounded-lg border border-dashed border-border bg-muted/10 p-5 text-center text-xs text-muted-foreground italic"
+              >
+                No primary instructor currently assigned. Choose an instructor below.
+              </div>
+            {:else}
+              <div class="space-y-2">
+                {#each sectionTeachers as teacher (teacher._id)}
+                  <div class="flex items-center justify-between rounded-lg border border-border bg-card p-3 shadow-xs">
+                    <div class="flex items-center gap-3">
+                      <Avatar.Root class="h-9 w-9 border border-border">
+                        <Avatar.Image src={teacher.avatarUrl} alt={teacher.name} />
+                        <Avatar.Fallback class="bg-primary/5 text-xs font-bold text-primary">
+                          {teacher.name.substring(0, 2).toUpperCase()}
+                        </Avatar.Fallback>
+                      </Avatar.Root>
+                      <div>
+                        <h4 class="text-xs font-bold text-foreground">{teacher.name}</h4>
+                        <p class="text-[10px] text-muted-foreground">{teacher.email}</p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      class="h-8 gap-1 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onclick={() => removeTeacher(teacher._id)}
                     >
-                      <div class="flex items-center gap-3">
-                        <Avatar.Root class="h-9 w-9 border border-border">
-                          <Avatar.Image src={teacher.avatarUrl} alt={teacher.name} />
+                      <UserX class="h-3.5 w-3.5" />
+                      Unassign Instructor
+                    </Button>
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </div>
+
+          <!-- Instructor assign block -->
+          {#if sectionTeachers.length === 0}
+            <Separator />
+            <div class="space-y-3">
+              <div class="flex flex-col gap-2">
+                <Label for="teacherSearch" class="text-xs font-semibold">Search Instructors</Label>
+                <Input
+                  id="teacherSearch"
+                  placeholder="Search by name or email..."
+                  bind:value={teacherSearchQuery}
+                  class="h-9 text-xs"
+                />
+              </div>
+
+              {#if filteredAvailableTeachers.length === 0}
+                <p class="py-4 text-center text-xs text-muted-foreground">No matching instructors found.</p>
+              {:else}
+                <div class="max-h-[200px] divide-y overflow-y-auto rounded-md border bg-background">
+                  {#each filteredAvailableTeachers as t (t._id)}
+                    <div class="flex items-center justify-between gap-4 p-3 hover:bg-muted/10">
+                      <div class="flex min-w-0 flex-1 items-center gap-3">
+                        <Avatar.Root class="h-8 w-8 border border-border">
+                          <Avatar.Image src={t.avatarUrl} alt={t.name} />
                           <Avatar.Fallback class="bg-primary/5 text-xs font-bold text-primary">
-                            {teacher.name.substring(0, 2).toUpperCase()}
+                            {t.name.substring(0, 2).toUpperCase()}
                           </Avatar.Fallback>
                         </Avatar.Root>
-                        <div>
-                          <h4 class="text-xs font-bold text-foreground">{teacher.name}</h4>
-                          <p class="text-[10px] text-muted-foreground">{teacher.email}</p>
+                        <div class="min-w-0 flex-1">
+                          <p class="truncate text-xs font-semibold">{t.name}</p>
+                          <p class="truncate text-[10px] text-muted-foreground">{t.email}</p>
                         </div>
                       </div>
                       <Button
-                        variant="ghost"
                         size="sm"
-                        class="h-8 gap-1 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        onclick={() => removeTeacher(teacher._id)}
+                        class="h-7 px-3 text-xs"
+                        variant="outline"
+                        onclick={() => {
+                          teacherToAssignId = t._id;
+                          assignTeacher();
+                        }}
                       >
-                        <UserX class="h-3.5 w-3.5" />
-                        Unassign Instructor
+                        Assign
                       </Button>
                     </div>
                   {/each}
                 </div>
               {/if}
             </div>
-
-            <!-- Instructor assign block -->
-            {#if sectionTeachers.length === 0}
-              <div class="flex flex-col gap-2 border-t border-border/30 pt-2">
-                <Label for="select-teacher" class="text-xs font-semibold">Assign Instructor</Label>
-                <div class="flex flex-col gap-3 sm:flex-row">
-                  <Select.Root type="single" bind:value={teacherToAssignId}>
-                    <Select.Trigger
-                      class="h-9 w-full border border-input bg-background text-xs focus:ring-1 focus:ring-ring focus:outline-hidden"
-                    >
-                      {selectedTeacherLabel}
-                    </Select.Trigger>
-                    <Select.Content class="max-h-[300px] overflow-y-auto">
-                      {#each availableTeachers as teacher (teacher._id)}
-                        <Select.Item value={teacher._id} label={teacher.name}>
-                          {teacher.name} ({teacher.email})
-                        </Select.Item>
-                      {/each}
-                    </Select.Content>
-                  </Select.Root>
-                  <Button
-                    type="submit"
-                    disabled={!teacherToAssignId}
-                    size="sm"
-                    class="h-9 gap-1.5 bg-primary text-xs font-semibold whitespace-nowrap text-primary-foreground hover:bg-primary/90"
-                  >
-                    <UserCheck class="h-3.5 w-3.5" />
-                    Assign Faculty
-                  </Button>
-                </div>
-              </div>
-            {:else}
-              <div class="rounded-lg border border-border/30 bg-muted/10 p-3 text-xs text-muted-foreground italic">
-                Unassign the current primary instructor to assign a different teacher.
-              </div>
-            {/if}
-          </Card.Content>
-        </Card.Root>
-      </form>
+          {:else}
+            <div class="rounded-lg border border-border/30 bg-muted/10 p-3 text-xs text-muted-foreground italic">
+              Unassign the current primary instructor to assign a different teacher.
+            </div>
+          {/if}
+        </Card.Content>
+      </Card.Root>
 
       <!-- 3. Student Enrollment Card -->
       <Card.Root class="overflow-hidden border border-border bg-card shadow-sm">
@@ -392,35 +416,50 @@
         </Card.Header>
 
         <Card.Content class="flex flex-col gap-6 p-6">
-          <!-- Enroll new student form -->
-          <form onsubmit={enrollStudent} class="flex flex-col gap-2">
-            <Label for="select-student" class="text-xs font-semibold">Enroll New Student</Label>
-            <div class="flex flex-col gap-3 sm:flex-row">
-              <Select.Root type="single" bind:value={studentToEnrollId}>
-                <Select.Trigger
-                  class="h-9 w-full border border-input bg-background text-xs focus:ring-1 focus:ring-ring focus:outline-hidden"
-                >
-                  {selectedStudentLabel}
-                </Select.Trigger>
-                <Select.Content class="max-h-[300px] overflow-y-auto">
-                  {#each availableStudents as student (student._id)}
-                    <Select.Item value={student._id} label={student.name}>
-                      {student.name} ({student.email})
-                    </Select.Item>
-                  {/each}
-                </Select.Content>
-              </Select.Root>
-              <Button
-                type="submit"
-                disabled={!studentToEnrollId}
-                size="sm"
-                class="h-9 gap-1.5 bg-primary text-xs font-semibold whitespace-nowrap text-primary-foreground hover:bg-primary/90"
-              >
-                <UserCheck class="h-3.5 w-3.5" />
-                Enroll Student
-              </Button>
-            </div>
-          </form>
+          <!-- Search & Enroll available students -->
+          <div class="space-y-3">
+            <Label for="studentEnrollSearch" class="text-xs font-semibold">Enroll New Student</Label>
+            <Input
+              id="studentEnrollSearch"
+              placeholder="Search students to enroll..."
+              bind:value={studentEnrollSearchQuery}
+              class="h-9 text-xs"
+            />
+
+            {#if filteredAvailableStudents.length === 0}
+              <p class="py-2 text-center text-xs text-muted-foreground">No matching unassigned students found.</p>
+            {:else}
+              <div class="max-h-[200px] divide-y overflow-y-auto rounded-md border bg-background">
+                {#each filteredAvailableStudents as s (s._id)}
+                  <div class="flex items-center justify-between gap-4 p-3 hover:bg-muted/10">
+                    <div class="flex min-w-0 flex-1 items-center gap-3">
+                      <Avatar.Root class="h-8 w-8 border border-border">
+                        <Avatar.Image src={s.avatarUrl} alt={s.name} />
+                        <Avatar.Fallback class="bg-primary/5 text-xs font-bold text-primary">
+                          {s.name.substring(0, 2).toUpperCase()}
+                        </Avatar.Fallback>
+                      </Avatar.Root>
+                      <div class="min-w-0 flex-1">
+                        <p class="truncate text-xs font-semibold">{s.name}</p>
+                        <p class="truncate text-[10px] text-muted-foreground">{s.email}</p>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      class="h-7 px-3 text-xs"
+                      onclick={() => {
+                        studentToEnrollId = s._id;
+                        enrollStudent();
+                      }}
+                    >
+                      Enroll
+                    </Button>
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </div>
 
           <!-- List of enrolled students -->
           <div class="space-y-3 border-t border-border/30 pt-4">
@@ -442,7 +481,7 @@
               <div
                 class="rounded-lg border border-dashed border-border bg-muted/10 p-5 text-center text-xs text-muted-foreground italic"
               >
-                No students currently enrolled. Use the selector above to enroll.
+                No students currently enrolled.
               </div>
             {:else}
               {@const filteredStudents = sectionStudents.filter(
