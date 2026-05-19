@@ -5,6 +5,7 @@
   import MonitorIcon from '@lucide/svelte/icons/monitor';
   import TerminalIcon from '@lucide/svelte/icons/terminal';
 
+  import previewImage from '$lib/assets/stride-preview.png';
   import { Badge } from '$lib/components/ui/badge';
   import { Button } from '$lib/components/ui/button';
 
@@ -25,13 +26,13 @@
       title: 'P2P Screenshare',
       description: 'Secure, low-latency live monitoring to support students exactly when they need it.',
       icon: MonitorIcon,
-      color: 'text-blue-500',
+      color: 'text-info',
     },
     {
       title: 'Academic Forum',
       description: 'Integrated community spaces for students and alumni to collaborate and grow.',
       icon: MessageSquareIcon,
-      color: 'text-orange-500',
+      color: 'text-warning',
     },
   ];
 
@@ -98,13 +99,12 @@
         <div
           class="relative rounded-2xl border border-border/50 bg-card/50 p-2 shadow-[0_0_50px_-12px_rgba(0,0,0,0.12)] backdrop-blur-md dark:shadow-2xl dark:shadow-primary/5"
         >
-          <div
-            class="flex aspect-video w-full items-center justify-center rounded-xl border border-dashed border-border/50 bg-muted/30"
-          >
-            <div class="flex flex-col items-center gap-4 text-muted-foreground/60">
-              <MonitorIcon size={64} strokeWidth={1} />
-              <span class="text-lg font-medium tracking-wide uppercase">Stride Platform Preview</span>
-            </div>
+          <div class="relative aspect-[16/9] w-full overflow-hidden rounded-xl border border-border/50 bg-muted/30">
+            <img
+              src={previewImage}
+              alt="Stride Platform Preview"
+              class="absolute inset-0 h-full w-full object-cover select-none"
+            />
           </div>
         </div>
       </div>
@@ -182,7 +182,7 @@
               size="lg"
               variant="secondary"
               href="/login"
-              class="h-16 rounded-full px-12 text-lg font-bold shadow-xl transition-all hover:scale-105 hover:bg-white hover:text-black"
+              class="h-16 rounded-full px-12 text-lg font-bold shadow-xl transition-all hover:scale-105 hover:bg-pure-white hover:text-pure-black"
             >
               Get Started Now
             </Button>

@@ -12,7 +12,19 @@ export const get = query({
 export const list = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query('problems').collect();
+    const problems = await ctx.db.query('problems').collect();
+    return await Promise.all(
+      problems.map(async (p) => {
+        const ios = await ctx.db
+          .query('problemIos')
+          .withIndex('by_problem', (q) => q.eq('problemId', p._id))
+          .collect();
+        return {
+          ...p,
+          testCaseCount: ios.length,
+        };
+      }),
+    );
   },
 });
 

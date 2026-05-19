@@ -44,7 +44,7 @@
   }
 </script>
 
-<div class="flex flex-col gap-6">
+<div class="flex flex-col gap-6 p-6">
   <!-- Header -->
   <div>
     {#if activity}

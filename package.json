@@ -21,7 +21,8 @@
     "test:all": "playwright test --workers=1 && playwright show-report",
     "knip": "knip",
     "check:colors": "bun scripts/check-colors.ts",
-    "calculate:blurhash": "bun scripts/calculate-blurhash.ts"
+    "calculate:blurhash": "bun scripts/calculate-blurhash.ts",
+    "seed": "convex run seed"
   },
   "devDependencies": {
     "@codemirror/autocomplete": "^6.20.2",
@@ -75,9 +76,11 @@
     "eslint": "^10.0.3",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-svelte": "^3.15.2",
+    "eslint-plugin-tailwindcss": "^3.18.3",
     "formsnap": "^2.0.1",
     "globals": "^17.4.0",
     "husky": "^9.1.7",
+    "isomorphic-dompurify": "^3.12.0",
     "knip": "^6.7.0",
     "layerchart": "2.0.0-next.48",
     "lint-staged": "^16.4.0",
@@ -85,6 +88,7 @@
     "mdsvex": "^0.12.6",
     "mode-watcher": "^1.1.0",
     "paneforge": "^1.0.2",
+    "peerjs": "^1.5.5",
     "phosphor-svelte": "^3.1.0",
     "playwright": "^1.58.2",
     "prettier": "^3.8.1",
@@ -95,6 +99,7 @@
     "sharp": "^0.34.5",
     "shiki": "^4.0.2",
     "shiki-magic-move": "^1.3.0",
+    "simple-peer": "^9.11.1",
     "svelte": "^5.54.0",
     "svelte-adapter-bun": "^1.0.1",
     "svelte-check": "^4.4.2",
@@ -113,9 +118,6 @@
     "vitest-browser-svelte": "^2.0.2"
   },
   "dependencies": {
-    "isomorphic-dompurify": "^3.12.0",
-    "peerjs": "^1.5.5",
-    "simple-peer": "^9.11.1",
     "convex": "^1.39.1",
     "convex-svelte": "^0.0.12"
   },

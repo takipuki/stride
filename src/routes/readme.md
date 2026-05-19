@@ -29,23 +29,24 @@ This document outlines the URL structure for the application and what each page 
 - [ ] `/(app)/sections/[sectionId]/+page.svelte` — Section hub listing its activities and members.
 - [ ] `/(app)/sections/[sectionId]/edit/+page.svelte` — Manage section details and user enrollments.
 - [x] `/(app)/sections/[sectionId]/cctv/+page.svelte` — Class CCTV grid view (real-time student screen sharing monitoring).
-- [x] `/(app)/sections/[sectionId]/sharescreen/+page.svelte` — Screen sharing client for students during live sessions.
+- [x] `/(app)/sections/sharescreen/+page.svelte` — Screen sharing client for students during live sessions.
 
 ### Activities (Exams & Live Classes)
 
-- [ ] `/(app)/activities/new/+page.svelte` — Create a new exam or class.
+- [x] `/(app)/activities/+page.svelte` — Activities Hub listing scheduled classes, exams, and performance reviews.
+- [x] `/(app)/activities/new/+page.svelte` — Create a new exam or class.
+- [x] `/(app)/activities/[activityId]/+page.svelte` — Scoreboard showing all student submissions and grades.
 - [x] `/(app)/activities/[activityId]/[problemId]/+page.svelte` — The live room (Exam interface or class viewer).
-- [ ] `/(app)/activities/[activityId]/edit/+page.svelte` — Update activity settings, attach and reorder problems.
-- [ ] `/(app)/activities/[activityId]/results/+page.svelte` — Scoreboard showing all student submissions and grades.
+- [x] `/(app)/activities/[activityId]/edit/+page.svelte` — Update activity settings, attach and reorder problems.
 - [x] `/(app)/activities/[activityId]/playback/+page.svelte` — Dashboard for reviewing student code progression.
 - [x] `/(app)/activities/[activityId]/playback/[problemId]/[studentId]/+page.svelte` — Playback of a student's code snapshots for a specific problem.
 
 ### Problems (Question Bank)
 
-- [ ] `/(app)/problems/+page.svelte` — Master list of coding problems.
+- [x] `/(app)/problems/+page.svelte` — Master list of coding problems.
 - [x] `/(app)/problems/new/+page.svelte` — Create a new programming problem.
-- [ ] `/(app)/problems/[problemId]/+page.svelte` — View problem details.
-- [ ] `/(app)/problems/[problemId]/edit/+page.svelte` — Edit problem text and test cases (I/Os).
+- [x] `/(app)/problems/[problemId]/+page.svelte` — View problem details.
+- [x] `/(app)/problems/[problemId]/edit/+page.svelte` — Edit problem text and test cases (I/Os).
 
 ### Communication
 
