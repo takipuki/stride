@@ -29,7 +29,7 @@ This document outlines the URL structure for the application and what each page 
 - [ ] `/(app)/sections/[sectionId]/+page.svelte` — Section hub listing its activities and members.
 - [ ] `/(app)/sections/[sectionId]/edit/+page.svelte` — Manage section details and user enrollments.
 - [x] `/(app)/sections/[sectionId]/cctv/+page.svelte` — Class CCTV grid view (real-time student screen sharing monitoring).
-- [x] `/(app)/sections/[sectionId]/sharescreen/+page.svelte` — Screen sharing client for students during live sessions.
+- [x] `/(app)/sections/sharescreen/+page.svelte` — Screen sharing client for students during live sessions.
 
 ### Activities (Exams & Live Classes)
 

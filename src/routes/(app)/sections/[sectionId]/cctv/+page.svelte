@@ -162,12 +162,15 @@
           }
         }
 
-        const peerInstance = new SimplePeer({ initiator: false, trickle: false });
+        const peerInstance = new SimplePeer({ initiator: false, trickle: true });
 
-        activeStreams[studentId] = {
-          peer: peerInstance,
-          stream: null,
-          status: 'connecting',
+        activeStreams = {
+          ...activeStreams,
+          [studentId]: {
+            peer: peerInstance,
+            stream: null,
+            status: 'connecting',
+          },
         };
 
         // Handle signaling responses back to the specific student
@@ -185,8 +188,12 @@
         peerInstance.on('stream', (s) => {
           console.log(`WebRTC stream established with student: ${studentId}`);
           if (activeStreams[studentId]) {
-            activeStreams[studentId].stream = s;
-            activeStreams[studentId].status = 'connected';
+            activeStreams[studentId] = {
+              ...activeStreams[studentId],
+              stream: s,
+              status: 'connected',
+            };
+            activeStreams = { ...activeStreams }; // Trigger Svelte 5 reactivity
           }
         });
 
@@ -251,6 +258,8 @@
         });
       }
       delete activeStreams[studentId];
+      activeStreams = { ...activeStreams }; // Trigger Svelte 5 reactivity
+
       if (fullscreenStudentId === studentId) {
         fullscreenStudentId = null;
       }
