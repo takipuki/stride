@@ -43,10 +43,10 @@ This document outlines the URL structure for the application and what each page 
 
 ### Problems (Question Bank)
 
-- [ ] `/(app)/problems/+page.svelte` — Master list of coding problems.
+- [x] `/(app)/problems/+page.svelte` — Master list of coding problems.
 - [x] `/(app)/problems/new/+page.svelte` — Create a new programming problem.
-- [ ] `/(app)/problems/[problemId]/+page.svelte` — View problem details.
-- [ ] `/(app)/problems/[problemId]/edit/+page.svelte` — Edit problem text and test cases (I/Os).
+- [x] `/(app)/problems/[problemId]/+page.svelte` — View problem details.
+- [x] `/(app)/problems/[problemId]/edit/+page.svelte` — Edit problem text and test cases (I/Os).
 
 ### Communication
 
