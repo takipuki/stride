@@ -16,6 +16,9 @@
     "format": "prettier --write .",
     "test:unit": "vitest",
     "test": "npm run test:unit -- --run",
+    "test:headed": "playwright test --headed --workers=1",
+    "test:report": "playwright show-report",
+    "test:all": "playwright test --workers=1 && playwright show-report",
     "knip": "knip",
     "check:colors": "bun scripts/check-colors.ts",
     "calculate:blurhash": "bun scripts/calculate-blurhash.ts"
