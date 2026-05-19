@@ -19,7 +19,7 @@ This document outlines the URL structure for the application and what each page 
 
 ### Administration
 
-- [ ] `/(app)/admin/+page.svelte` — Overview everything.
+- [x] `/(app)/admin/+page.svelte` — Overview everything.
 - [x] `/(app)/admin/users/+page.svelte` — Admin dashboard to manage users (create accounts, assign roles).
 
 ### Sections (Courses/Classes)

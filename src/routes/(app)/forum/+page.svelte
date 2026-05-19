@@ -6,11 +6,14 @@
   import Clock from '@lucide/svelte/icons/clock';
   import Flame from '@lucide/svelte/icons/flame';
   import MessageSquare from '@lucide/svelte/icons/message-square';
+  import Pencil from '@lucide/svelte/icons/pencil';
   import Plus from '@lucide/svelte/icons/plus';
+  import Settings from '@lucide/svelte/icons/settings';
   import Share2 from '@lucide/svelte/icons/share-2';
   import ShieldAlert from '@lucide/svelte/icons/shield-alert';
   import Signature from '@lucide/svelte/icons/signature';
   import Sparkles from '@lucide/svelte/icons/sparkles';
+  import Tag from '@lucide/svelte/icons/tag';
   import Trash2 from '@lucide/svelte/icons/trash-2';
   import TrendingUp from '@lucide/svelte/icons/trending-up';
   import { useConvexClient, useQuery } from 'convex-svelte';
@@ -26,6 +29,9 @@
   import { Badge } from '$lib/components/ui/badge/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
   import * as Card from '$lib/components/ui/card/index.js';
+  import * as Dialog from '$lib/components/ui/dialog/index.js';
+  import { Input } from '$lib/components/ui/input/index.js';
+  import { Label } from '$lib/components/ui/label/index.js';
   import { Separator } from '$lib/components/ui/separator/index.js';
   import { session } from '$lib/session';
   import { cn } from '$lib/utils';
@@ -34,15 +40,24 @@
 
   // State
   let activeSort = $state<'new' | 'top' | 'hot'>('new');
-  let selectedTagId = $state<Id<'tags'> | null>(null);
+  let selectedTagIds = $state<Id<'tags'>[]>([]);
   let showOnlyMyPosts = $state(false);
   let postToDeleteId = $state<Id<'posts'> | null>(null);
   let deletePostDialogOpen = $state(false);
 
+  // Manage tags state
+  let manageTagsDialogOpen = $state(false);
+  let newTagName = $state('');
+  let editingTagId = $state<Id<'tags'> | null>(null);
+  let editingTagName = $state('');
+  let isCreatingTag = $state(false);
+  let isUpdatingTag = $state(false);
+  let isDeletingTag = $state(false);
+
   // Queries
   const postsQuery = useQuery(api.posts.list, () => ({
     userId: $session?.userId || undefined,
-    tagId: selectedTagId || undefined,
+    tagIds: selectedTagIds,
     sortBy: activeSort,
     onlyMyPosts: showOnlyMyPosts || undefined,
   }));
@@ -95,6 +110,58 @@
     if (hours < 24) return `${hours}h ago`;
     const days = Math.floor(hours / 24);
     return `${days}d ago`;
+  }
+
+  async function handleCreateTag() {
+    if (!newTagName.trim()) return;
+    isCreatingTag = true;
+    try {
+      const cleanedName = newTagName.trim().toLowerCase().replace(/#/g, '');
+      await client.mutation(api.posts.createTag, { name: cleanedName });
+      toast.success('Tag created successfully.');
+      newTagName = '';
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to create tag.');
+    } finally {
+      isCreatingTag = false;
+    }
+  }
+
+  async function handleUpdateTag(tagId: Id<'tags'>) {
+    if (!editingTagName.trim()) return;
+    isUpdatingTag = true;
+    try {
+      const cleanedName = editingTagName.trim().toLowerCase().replace(/#/g, '');
+      await client.mutation(api.posts.updateTag, { id: tagId, name: cleanedName });
+      toast.success('Tag updated successfully.');
+      editingTagId = null;
+      editingTagName = '';
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update tag.');
+    } finally {
+      isUpdatingTag = false;
+    }
+  }
+
+  function startEditingTag(tag: any) {
+    editingTagId = tag._id;
+    editingTagName = tag.name;
+  }
+
+  async function handleDeleteTag(tagId: Id<'tags'>) {
+    isDeletingTag = true;
+    try {
+      await client.mutation(api.posts.deleteTag, { id: tagId });
+      toast.success('Tag deleted successfully.');
+      selectedTagIds = selectedTagIds.filter((id) => id !== tagId);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to delete tag.');
+    } finally {
+      isDeletingTag = false;
+    }
   }
 </script>
 
@@ -164,21 +231,23 @@
     </div>
 
     <!-- Active Tag Indicator -->
-    {#if selectedTagId}
+    {#if selectedTagIds.length > 0}
       <div
         class="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 px-4 py-2"
         transition:slide={{ duration: 200 }}
       >
-        <div class="flex items-center gap-2">
-          <span class="text-sm font-medium">Filtering by Tag:</span>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-sm font-medium">Filtering by Tags:</span>
           {#if tagsQuery.data}
-            {@const tag = tagsQuery.data.find((t) => t?._id === selectedTagId)}
-            {#if tag}
-              <Badge class="border-primary/30 bg-primary/20 text-primary hover:bg-primary/25">#{tag.name}</Badge>
-            {/if}
+            {#each selectedTagIds as tagId (tagId)}
+              {@const tag = tagsQuery.data.find((t) => t?._id === tagId)}
+              {#if tag}
+                <Badge class="border-primary/30 bg-primary/20 text-primary hover:bg-primary/25">#{tag.name}</Badge>
+              {/if}
+            {/each}
           {/if}
         </div>
-        <Button variant="ghost" size="sm" onclick={() => (selectedTagId = null)} class="h-8 px-2 text-xs"
+        <Button variant="ghost" size="sm" onclick={() => (selectedTagIds = [])} class="h-8 px-2 text-xs"
           >Clear Filter</Button
         >
       </div>
@@ -317,7 +386,11 @@
                             <button
                               onclick={(e) => {
                                 e.stopPropagation();
-                                selectedTagId = tag._id;
+                                if (selectedTagIds.includes(tag._id)) {
+                                  selectedTagIds = selectedTagIds.filter((id) => id !== tag._id);
+                                } else {
+                                  selectedTagIds = [...selectedTagIds, tag._id];
+                                }
                               }}
                               class="inline-block"
                             >
@@ -379,12 +452,37 @@
       </ul>
     </div>
 
-    <!-- Popular Tags Cloud -->
+    <!-- Tags Cloud -->
     <div class="flex flex-col gap-3 rounded-xl border bg-card p-5 shadow-sm">
-      <h3 class="flex items-center gap-1.5 text-sm font-bold tracking-wider text-muted-foreground uppercase">
-        <Award class="h-4 w-4" />
-        Popular Tags
-      </h3>
+      <div class="flex items-center justify-between">
+        <h3 class="flex items-center gap-1.5 text-sm font-bold tracking-wider text-muted-foreground uppercase">
+          <Tag class="h-4 w-4" />
+          Tags
+        </h3>
+        <div class="flex items-center gap-1">
+          {#if selectedTagIds.length > 0}
+            <Button
+              variant="ghost"
+              size="sm"
+              class="h-7 cursor-pointer px-2 text-xs font-semibold text-muted-foreground hover:text-foreground"
+              onclick={() => (selectedTagIds = [])}
+            >
+              Reset
+            </Button>
+          {/if}
+          {#if $session?.role === 'admin'}
+            <Button
+              variant="ghost"
+              size="icon"
+              class="h-7 w-7 cursor-pointer text-muted-foreground hover:text-foreground"
+              onclick={() => (manageTagsDialogOpen = true)}
+              title="Manage Tags"
+            >
+              <Settings class="h-4 w-4" />
+            </Button>
+          {/if}
+        </div>
+      </div>
       <Separator />
       <div class="flex flex-wrap gap-1.5">
         {#if tagsQuery.isLoading}
@@ -394,11 +492,20 @@
         {:else}
           {#each tagsQuery.data as tag, i (tag?._id || i)}
             {#if tag}
-              <button onclick={() => (selectedTagId = selectedTagId === tag._id ? null : tag._id)} class="inline-block">
+              <button
+                onclick={() => {
+                  if (selectedTagIds.includes(tag._id)) {
+                    selectedTagIds = selectedTagIds.filter((id) => id !== tag._id);
+                  } else {
+                    selectedTagIds = [...selectedTagIds, tag._id];
+                  }
+                }}
+                class="inline-block"
+              >
                 <Badge
                   class={cn(
                     'cursor-pointer border text-xs font-normal transition-all duration-200',
-                    selectedTagId === tag._id
+                    selectedTagIds.includes(tag._id)
                       ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/95'
                       : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground',
                   )}
@@ -449,3 +556,91 @@
     </AlertDialog.Footer>
   </AlertDialog.Content>
 </AlertDialog.Root>
+
+<!-- Manage Tags Dialog -->
+<Dialog.Root bind:open={manageTagsDialogOpen}>
+  <Dialog.Content class="sm:max-w-[425px]">
+    <Dialog.Header>
+      <Dialog.Title class="flex items-center gap-2">
+        <Tag class="h-5 w-5 text-primary" /> Manage Community Tags
+      </Dialog.Title>
+      <Dialog.Description>
+        Add new tags or edit existing ones. Changes will reflect instantly on all posts.
+      </Dialog.Description>
+    </Dialog.Header>
+    <div class="grid gap-4 py-4">
+      <div class="flex items-center gap-2 border-b pb-4">
+        <div class="flex-1">
+          <Input
+            placeholder="new-tag-name"
+            bind:value={newTagName}
+            class="font-mono text-sm"
+            onkeydown={(e) => e.key === 'Enter' && handleCreateTag()}
+          />
+        </div>
+        <Button size="sm" onclick={handleCreateTag} disabled={isCreatingTag}>Add Tag</Button>
+      </div>
+
+      <div class="max-h-60 space-y-2 overflow-y-auto pr-1">
+        <Label class="text-xs font-bold tracking-wider text-muted-foreground uppercase">Active Tags</Label>
+        {#if tagsQuery.isLoading}
+          <div class="text-xs text-muted-foreground italic">Loading tags...</div>
+        {:else if !tagsQuery.data || tagsQuery.data.length === 0}
+          <div class="text-xs text-muted-foreground italic">No tags created yet.</div>
+        {:else}
+          {#each tagsQuery.data as tag (tag._id)}
+            <div class="flex items-center justify-between gap-2 rounded-lg border bg-muted/20 p-2 text-xs">
+              {#if editingTagId === tag._id}
+                <div class="flex flex-1 items-center gap-1.5">
+                  <Input
+                    bind:value={editingTagName}
+                    class="h-7 px-2 py-1 font-mono text-xs"
+                    onkeydown={(e) => e.key === 'Enter' && handleUpdateTag(tag._id)}
+                  />
+                  <Button
+                    size="sm"
+                    class="h-7 px-2 text-[10px]"
+                    onclick={() => handleUpdateTag(tag._id)}
+                    disabled={isUpdatingTag}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    class="h-7 px-2 text-[10px] text-muted-foreground"
+                    onclick={() => (editingTagId = null)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              {:else}
+                <span class="font-mono font-semibold text-foreground">#{tag.name}</span>
+                <div class="flex items-center gap-0.5">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="h-6 w-6 cursor-pointer text-muted-foreground hover:text-foreground"
+                    onclick={() => startEditingTag(tag)}
+                  >
+                    <Pencil class="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="h-6 w-6 cursor-pointer text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                    onclick={() => handleDeleteTag(tag._id)}
+                    disabled={isDeletingTag}
+                    title="Delete Tag"
+                  >
+                    <Trash2 class="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              {/if}
+            </div>
+          {/each}
+        {/if}
+      </div>
+    </div>
+  </Dialog.Content>
+</Dialog.Root>

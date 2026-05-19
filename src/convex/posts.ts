@@ -53,23 +53,29 @@ export const get = query({
 export const list = query({
   args: {
     userId: v.optional(v.id('users')),
-    tagId: v.optional(v.id('tags')),
+    tagIds: v.optional(v.array(v.id('tags'))),
     sortBy: v.optional(v.union(v.literal('new'), v.literal('top'), v.literal('hot'))),
     onlyMyPosts: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    let posts = args.tagId
-      ? (
-          await Promise.all(
-            (
-              await ctx.db
-                .query('postTags')
-                .withIndex('by_tag', (q) => q.eq('tagId', args.tagId!))
-                .collect()
-            ).map((pt) => ctx.db.get(pt.postId)),
-          )
-        ).filter((p): p is Doc<'posts'> => p !== null)
-      : await ctx.db.query('posts').collect();
+    let posts: Doc<'posts'>[] = [];
+    if (args.tagIds && args.tagIds.length > 0) {
+      const allPostIds = new Set<string>();
+      for (const tId of args.tagIds) {
+        const mappings = await ctx.db
+          .query('postTags')
+          .withIndex('by_tag', (q) => q.eq('tagId', tId))
+          .collect();
+        for (const m of mappings) {
+          allPostIds.add(m.postId);
+        }
+      }
+      posts = (await Promise.all(Array.from(allPostIds).map((id) => ctx.db.get(id as Id<'posts'>)))).filter(
+        (p): p is Doc<'posts'> => p !== null,
+      );
+    } else {
+      posts = await ctx.db.query('posts').collect();
+    }
 
     if (args.onlyMyPosts && args.userId) {
       posts = posts.filter((p) => p.authorId === args.userId);
@@ -335,6 +341,27 @@ export const createTag = mutation({
       .first();
     if (existing) return existing._id;
     return await ctx.db.insert('tags', { name: args.name });
+  },
+});
+
+export const updateTag = mutation({
+  args: { id: v.id('tags'), name: v.string() },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db.get(args.id);
+    if (!existing) throw new Error('Tag not found');
+    await ctx.db.patch(args.id, { name: args.name });
+  },
+});
+
+export const deleteTag = mutation({
+  args: { id: v.id('tags') },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
+    const postTags = await ctx.db
+      .query('postTags')
+      .withIndex('by_tag', (q) => q.eq('tagId', args.id))
+      .collect();
+    await Promise.all(postTags.map((pt) => ctx.db.delete(pt._id)));
   },
 });
 
